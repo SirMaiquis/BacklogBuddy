@@ -9,7 +9,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GAME_PLATFORMS, GAME_GENRES } from "@/types/game";
-import { Search, SlidersHorizontal, X, Gamepad, Joystick } from "lucide-react";
+import {
+  Search,
+  SlidersHorizontal,
+  X,
+  Gamepad,
+  Joystick,
+  Star,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -21,6 +28,7 @@ export interface GameFilters {
   search: string;
   platform: string;
   genre: string;
+  favorites: boolean;
 }
 
 export function GameFilters({ onFilterChange }: GameFiltersProps) {
@@ -29,6 +37,7 @@ export function GameFilters({ onFilterChange }: GameFiltersProps) {
     search: "",
     platform: "",
     genre: "",
+    favorites: false,
   });
 
   const handleFilterChange = (key: keyof GameFilters, value: string) => {
@@ -38,7 +47,12 @@ export function GameFilters({ onFilterChange }: GameFiltersProps) {
   };
 
   const handleReset = () => {
-    const resetFilters = { search: "", platform: "", genre: "" };
+    const resetFilters = {
+      search: "",
+      platform: "",
+      genre: "",
+      favorites: false,
+    };
     setFilters(resetFilters);
     onFilterChange(resetFilters);
   };
@@ -47,6 +61,7 @@ export function GameFilters({ onFilterChange }: GameFiltersProps) {
     filters.search ? 1 : 0,
     filters.platform ? 1 : 0,
     filters.genre ? 1 : 0,
+    filters.favorites ? 1 : 0,
   ].reduce((a, b) => a + b, 0);
 
   return (
@@ -91,7 +106,7 @@ export function GameFilters({ onFilterChange }: GameFiltersProps) {
         </div>
 
         {isExpanded && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Gamepad className="h-4 w-4 text-primary" />
@@ -137,6 +152,25 @@ export function GameFilters({ onFilterChange }: GameFiltersProps) {
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-primary" />
+                <label className="text-sm font-medium">Favorites</label>
+              </div>
+              <Button
+                variant={filters.favorites ? "default" : "outline"}
+                className={`w-full justify-start gap-2 ${filters.favorites ? "bg-yellow-500 hover:bg-yellow-600" : ""}`}
+                onClick={() =>
+                  handleFilterChange("favorites", !filters.favorites)
+                }
+              >
+                <Star
+                  className={`h-4 w-4 ${filters.favorites ? "fill-white" : ""}`}
+                />
+                {filters.favorites ? "Favorites Only" : "All Games"}
+              </Button>
+            </div>
           </div>
         )}
 
@@ -170,6 +204,21 @@ export function GameFilters({ onFilterChange }: GameFiltersProps) {
                 Genre: {filters.genre}
                 <button
                   onClick={() => handleFilterChange("genre", "")}
+                  className="ml-1 hover:text-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {filters.favorites && (
+              <Badge
+                variant="secondary"
+                className="gap-1 px-2 py-1 bg-yellow-500/20"
+              >
+                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500 mr-1" />
+                Favorites Only
+                <button
+                  onClick={() => handleFilterChange("favorites", false)}
                   className="ml-1 hover:text-foreground"
                 >
                   <X className="h-3 w-3" />

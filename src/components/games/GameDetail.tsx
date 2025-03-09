@@ -54,6 +54,7 @@ import {
   Timer,
   CheckCircle,
   Award,
+  Heart,
 } from "lucide-react";
 
 export function GameDetail() {
@@ -450,6 +451,32 @@ export function GameDetail() {
             <div className="flex gap-2">
               {!isEditing ? (
                 <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() =>
+                      updateGame(id, { favorite: !game.favorite }).then(() => {
+                        setGame({ ...game, favorite: !game.favorite });
+                        toast({
+                          title: game.favorite
+                            ? "Removed from favorites"
+                            : "Added to favorites",
+                          description: game.favorite
+                            ? "Game removed from favorites"
+                            : "Game added to favorites",
+                        });
+                      })
+                    }
+                    title={
+                      game.favorite
+                        ? "Remove from favorites"
+                        : "Add to favorites"
+                    }
+                  >
+                    <Star
+                      className={`h-4 w-4 ${game.favorite ? "fill-yellow-400 text-yellow-400" : ""}`}
+                    />
+                  </Button>
                   <Button
                     variant="outline"
                     size="icon"

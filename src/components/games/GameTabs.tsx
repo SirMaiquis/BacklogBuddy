@@ -18,6 +18,7 @@ export function GameTabs() {
     search: "",
     platform: "",
     genre: "",
+    favorites: false,
   });
 
   const loadGames = async () => {
@@ -60,6 +61,11 @@ export function GameTabs() {
     // Apply genre filter
     if (filters.genre) {
       result = result.filter((game) => game.genre === filters.genre);
+    }
+
+    // Apply favorites filter
+    if (filters.favorites) {
+      result = result.filter((game) => game.favorite === true);
     }
 
     setFilteredGames(result);

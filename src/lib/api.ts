@@ -140,6 +140,7 @@ export async function createGame(
         achievements_earned: game.achievements_earned || 0,
         achievements_total: game.achievements_total || 0,
         estimated_completion_time: game.estimated_completion_time,
+        favorite: game.favorite || false,
         user_id: userData.user.id,
       },
     ])

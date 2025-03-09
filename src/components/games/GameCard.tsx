@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Game } from "@/types/game";
-import { Clock, Trophy } from "lucide-react";
+import { Clock, Trophy, Star } from "lucide-react";
 
 interface GameCardProps {
   game: Game;
@@ -45,6 +45,11 @@ export function GameCard({ game, onClick }: GameCardProps) {
             {game.status === "completed" ? "Completed" : ""}
           </Badge>
         </div>
+        {game.favorite && (
+          <div className="absolute top-2 left-2">
+            <Star className="h-5 w-5 fill-yellow-400 text-yellow-400 drop-shadow-md" />
+          </div>
+        )}
       </div>
       <CardContent className="p-4 flex-grow">
         <h3 className="font-semibold text-lg mb-2 line-clamp-1 hover:line-clamp-none transition-all">

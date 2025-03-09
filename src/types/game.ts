@@ -23,6 +23,7 @@ export interface Game {
   game_modes?: string[];
   external_game_id?: string;
   external_provider?: string;
+  favorite?: boolean;
 }
 
 export interface ExternalGameProvider {
