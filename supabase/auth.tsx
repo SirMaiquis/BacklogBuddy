@@ -49,16 +49,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+    const response = await fetch(
+      "https://3wn67830-3000.use2.devtunnels.ms/auth/signin",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to sign in");
+    }
+
+    const data = await response.json();
+    const userData = { ...data.user, access_token: data.session.access_token };
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+    return data;
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    const response = await fetch(
+      "https://3wn67830-3000.use2.devtunnels.ms/auth/signout",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${user?.access_token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to sign out");
+    }
+
+    setUser(null);
+    localStorage.removeItem("user");
   };
 
   const updateUserProfile = async (data: { [key: string]: any }) => {

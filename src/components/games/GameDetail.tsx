@@ -26,7 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
-import { GAME_STATUSES, GAME_GENRES, GAME_MODES } from "@/types/game";
+import { GAME_STATUSES } from "@/types/game";
 import {
   fetchGame,
   updateGame,
@@ -55,10 +55,12 @@ import {
   CheckCircle,
   Award,
   Heart,
+  FileText,
+  Gamepad,
 } from "lucide-react";
 
 export function GameDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [game, setGame] = useState<Game | null>(null);
@@ -71,43 +73,21 @@ export function GameDetail() {
   const [editedNoteContent, setEditedNoteContent] = useState("");
   const [activeTab, setActiveTab] = useState("details");
 
-  // Mock data for new fields
-  const mockData = {
-    cover_art:
-      "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80",
-    platform: "PlayStation 5",
-    genre: "Action",
-    rating: 4.5,
-    genres: ["Action", "Adventure", "RPG"],
-    game_modes: ["Single Player", "Online Co-op"],
-    time_to_beat: {
-      hastily: 15,
-      normally: 30,
-      completionist: 60,
-    },
-  };
-
   const loadGame = async () => {
     if (!id) return;
     setIsLoading(true);
     try {
       const gameData = await fetchGame(id);
-
-      // Add mock data for new fields if they don't exist
-      const enhancedGameData = {
-        ...gameData,
-        // Add external data that would come from the external provider
-        cover_art: gameData.cover_art || mockData.cover_art || defaultCoverArt,
-        platform: gameData.platform || mockData.platform,
-        genre: gameData.genre || mockData.genre,
-        rating: gameData.rating || mockData.rating,
-        genres: gameData.genres || mockData.genres,
-        game_modes: gameData.game_modes || mockData.game_modes,
-        time_to_beat: gameData.time_to_beat || mockData.time_to_beat,
-      };
-
-      setGame(enhancedGameData);
-      setEditedGame(enhancedGameData);
+      setGame(gameData);
+      setEditedGame({
+        status: gameData.status,
+        playtime: gameData.playtime,
+        completion_percentage: gameData.completion_percentage,
+        achievements_earned: gameData.achievements_earned,
+        achievements_total: gameData.achievements_total,
+        estimated_completion_time: gameData.estimated_completion_time,
+        favorite: gameData.favorite,
+      });
 
       const notesData = await fetchGameNotes(id);
       setNotes(notesData);
@@ -132,18 +112,7 @@ export function GameDetail() {
 
     try {
       const updatedGame = await updateGame(id, editedGame);
-      // Add mock data back if it was removed during the update
-      const enhancedUpdatedGame = {
-        ...updatedGame,
-        cover_art: updatedGame.cover_art || game.cover_art,
-        platform: updatedGame.platform || game.platform,
-        genre: updatedGame.genre || game.genre,
-        rating: updatedGame.rating || game.rating,
-        genres: updatedGame.genres || game.genres,
-        game_modes: updatedGame.game_modes || game.game_modes,
-        time_to_beat: updatedGame.time_to_beat || game.time_to_beat,
-      };
-      setGame(enhancedUpdatedGame);
+      setGame(updatedGame);
       setIsEditing(false);
       toast({
         title: "Changes saved",
@@ -248,33 +217,6 @@ export function GameDetail() {
     }
   };
 
-  const handleGenreChange = (selectedGenres: string[]) => {
-    setEditedGame({
-      ...editedGame,
-      genres: selectedGenres,
-    });
-  };
-
-  const handleGameModeChange = (selectedModes: string[]) => {
-    setEditedGame({
-      ...editedGame,
-      game_modes: selectedModes,
-    });
-  };
-
-  const handleTimeToBeatChange = (
-    type: "hastily" | "normally" | "completionist",
-    value: string,
-  ) => {
-    setEditedGame({
-      ...editedGame,
-      time_to_beat: {
-        ...editedGame.time_to_beat,
-        [type]: parseInt(value) || 0,
-      },
-    });
-  };
-
   if (isLoading) {
     return (
       <div className="container mx-auto p-6">
@@ -301,36 +243,6 @@ export function GameDetail() {
   const defaultCoverArt =
     "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80";
 
-  // Render star rating
-  const renderStarRating = (rating: number) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
-    return (
-      <div className="flex items-center">
-        {[...Array(fullStars)].map((_, i) => (
-          <Star
-            key={`full-${i}`}
-            className="h-4 w-4 fill-yellow-400 text-yellow-400"
-          />
-        ))}
-        {hasHalfStar && (
-          <div className="relative">
-            <Star className="h-4 w-4 text-yellow-400" />
-            <div className="absolute inset-0 overflow-hidden w-1/2">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            </div>
-          </div>
-        )}
-        {[...Array(emptyStars)].map((_, i) => (
-          <Star key={`empty-${i}`} className="h-4 w-4 text-yellow-400" />
-        ))}
-        <span className="ml-2 text-sm font-medium">{rating.toFixed(1)}</span>
-      </div>
-    );
-  };
-
   return (
     <div className="container mx-auto p-6">
       <Button variant="outline" onClick={() => navigate(-1)} className="mb-6">
@@ -351,77 +263,113 @@ export function GameDetail() {
             </CardContent>
           </Card>
 
-          {/* Game Info Card */}
           <Card className="custom-card mt-6">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Game Info</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Rating */}
               <div className="space-y-1">
                 <p className="text-sm font-medium flex items-center gap-2">
-                  <Award className="h-4 w-4 text-primary" /> Rating
+                  <Tag className="h-4 w-4 text-primary" /> Title
                 </p>
-                {renderStarRating(game.rating || 0)}
+                <p className="text-sm">{game.title}</p>
               </div>
 
-              {/* Genres */}
-              <div className="space-y-1">
-                <p className="text-sm font-medium flex items-center gap-2">
-                  <Tag className="h-4 w-4 text-primary" /> Genres
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {game.genres &&
-                    game.genres.map((genre) => (
+              {game.platforms && game.platforms.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    <Gamepad className="h-4 w-4 text-primary" /> Platforms
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {game.platforms.map((platform) => (
+                      <Badge
+                        key={platform}
+                        variant="outline"
+                        className="text-xs"
+                      >
+                        {platform}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {game.genres && (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-primary" /> Genres
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {game.genres.map((genre) => (
                       <Badge key={genre} variant="outline" className="text-xs">
                         {genre}
                       </Badge>
                     ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Game Modes */}
-              <div className="space-y-1">
-                <p className="text-sm font-medium flex items-center gap-2">
-                  <Users className="h-4 w-4 text-primary" /> Game Modes
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {game.game_modes &&
-                    game.game_modes.map((mode) => (
-                      <Badge key={mode} variant="secondary" className="text-xs">
-                        {mode}
-                      </Badge>
-                    ))}
+              {game.summary && (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" /> Summary
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {game.summary}
+                  </p>
                 </div>
-              </div>
+              )}
 
-              {/* Time to Beat */}
-              <div className="space-y-1">
-                <p className="text-sm font-medium flex items-center gap-2">
-                  <Timer className="h-4 w-4 text-primary" /> Time to Beat
-                </p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-1">
-                      <Zap className="h-3 w-3 text-amber-500" /> Hastily
-                    </div>
-                    <span>{game.time_to_beat?.hastily || 0} hours</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3 text-blue-500" /> Normally
-                    </div>
-                    <span>{game.time_to_beat?.normally || 0} hours</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-1">
-                      <CheckCircle className="h-3 w-3 text-green-500" />{" "}
-                      Completionist
-                    </div>
-                    <span>{game.time_to_beat?.completionist || 0} hours</span>
+              {game.rating && (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    <Star className="h-4 w-4 text-primary" /> Rating
+                  </p>
+                  <p className="text-sm">{Math.round(game.rating)}%</p>
+                </div>
+              )}
+
+              {game.time_to_beat && (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    <Timer className="h-4 w-4 text-primary" /> Time to Beat
+                  </p>
+                  <div className="space-y-2 text-sm">
+                    {game.time_to_beat.hastily && (
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1">
+                          <Zap className="h-3 w-3 text-amber-500" /> Hastily
+                        </div>
+                        <span>
+                          {Math.round(game.time_to_beat.hastily / 3600)} hours
+                        </span>
+                      </div>
+                    )}
+                    {game.time_to_beat.normally && (
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3 text-blue-500" /> Normally
+                        </div>
+                        <span>
+                          {Math.round(game.time_to_beat.normally / 3600)} hours
+                        </span>
+                      </div>
+                    )}
+                    {game.time_to_beat.completionist && (
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1">
+                          <CheckCircle className="h-3 w-3 text-green-500" />{" "}
+                          Completionist
+                        </div>
+                        <span>
+                          {Math.round(game.time_to_beat.completionist / 3600)}{" "}
+                          hours
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -431,8 +379,8 @@ export function GameDetail() {
             <div>
               <h1 className="text-3xl font-bold gradient-text">{game.title}</h1>
               <div className="flex flex-wrap gap-2 mt-2">
-                {game.platform && (
-                  <Badge variant="outline">{game.platform}</Badge>
+                {game.platforms && game.platforms.length > 0 && (
+                  <Badge variant="outline">{game.platforms[0]}</Badge>
                 )}
                 <Badge
                   className={`
@@ -680,160 +628,23 @@ export function GameDetail() {
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <Separator />
-
-                  {/* Rating */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Award className="h-4 w-4" /> Rating (0-5)
-                    </label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="5"
-                      step="0.1"
-                      value={editedGame.rating || game.rating || ""}
-                      onChange={(e) =>
-                        setEditedGame({
-                          ...editedGame,
-                          rating: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                    />
-                  </div>
-
-                  {/* Time to Beat */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Timer className="h-4 w-4" /> Time to Beat (hours)
-                    </label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-1">
-                        <label className="text-xs flex items-center gap-1">
-                          <Zap className="h-3 w-3 text-amber-500" /> Hastily
-                        </label>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={
-                            editedGame.time_to_beat?.hastily ||
-                            game.time_to_beat?.hastily ||
-                            ""
-                          }
-                          onChange={(e) =>
-                            handleTimeToBeatChange("hastily", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-xs flex items-center gap-1">
-                          <Clock className="h-3 w-3 text-blue-500" /> Normally
-                        </label>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={
-                            editedGame.time_to_beat?.normally ||
-                            game.time_to_beat?.normally ||
-                            ""
-                          }
-                          onChange={(e) =>
-                            handleTimeToBeatChange("normally", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-xs flex items-center gap-1">
-                          <CheckCircle className="h-3 w-3 text-green-500" />{" "}
-                          Completionist
-                        </label>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={
-                            editedGame.time_to_beat?.completionist ||
-                            game.time_to_beat?.completionist ||
-                            ""
-                          }
-                          onChange={(e) =>
-                            handleTimeToBeatChange(
-                              "completionist",
-                              e.target.value,
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Genres - Multi-select */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Tag className="h-4 w-4" /> Genres
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {GAME_GENRES.map((genre) => {
-                        const isSelected =
-                          editedGame.genres?.includes(genre) ||
-                          (game.genres?.includes(genre) && !editedGame.genres);
-                        return (
-                          <Badge
-                            key={genre}
-                            variant={isSelected ? "default" : "outline"}
-                            className="cursor-pointer"
-                            onClick={() => {
-                              const currentGenres =
-                                editedGame.genres || game.genres || [];
-                              if (isSelected) {
-                                handleGenreChange(
-                                  currentGenres.filter((g) => g !== genre),
-                                );
-                              } else {
-                                handleGenreChange([...currentGenres, genre]);
-                              }
-                            }}
-                          >
-                            {genre}
-                          </Badge>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Game Modes - Multi-select */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Users className="h-4 w-4" /> Game Modes
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {GAME_MODES.map((mode) => {
-                        const isSelected =
-                          editedGame.game_modes?.includes(mode) ||
-                          (game.game_modes?.includes(mode) &&
-                            !editedGame.game_modes);
-                        return (
-                          <Badge
-                            key={mode}
-                            variant={isSelected ? "secondary" : "outline"}
-                            className="cursor-pointer"
-                            onClick={() => {
-                              const currentModes =
-                                editedGame.game_modes || game.game_modes || [];
-                              if (isSelected) {
-                                handleGameModeChange(
-                                  currentModes.filter((m) => m !== mode),
-                                );
-                              } else {
-                                handleGameModeChange([...currentModes, mode]);
-                              }
-                            }}
-                          >
-                            {mode}
-                          </Badge>
-                        );
-                      })}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Estimated Completion Time (hours)
+                      </label>
+                      <Input
+                        type="number"
+                        min="0"
+                        value={editedGame.estimated_completion_time || ""}
+                        onChange={(e) =>
+                          setEditedGame({
+                            ...editedGame,
+                            estimated_completion_time:
+                              parseInt(e.target.value) || 0,
+                          })
+                        }
+                      />
                     </div>
                   </div>
                 </CardContent>

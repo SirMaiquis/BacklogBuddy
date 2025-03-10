@@ -87,10 +87,16 @@ export function AddGameDialog({ onGameAdded, trigger }: AddGameDialogProps) {
 
     try {
       await createGame({
-        ...formData,
+        status: formData.status,
+        playtime: 0,
+        completion_percentage: 0,
+        achievements_earned: 0,
+        achievements_total: 0,
         estimated_completion_time: formData.estimated_completion_time
           ? parseInt(formData.estimated_completion_time as string)
           : undefined,
+        favorite: false,
+        igdb_id: parseInt(formData.external_game_id),
       });
 
       toast({
@@ -177,50 +183,6 @@ export function AddGameDialog({ onGameAdded, trigger }: AddGameDialogProps) {
                   </div>
                 )}
 
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="title" className="text-right">
-                    Title *
-                  </Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleChange("title", e.target.value)}
-                    className="col-span-3"
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="cover_art" className="text-right">
-                    Cover Art URL
-                  </Label>
-                  <Input
-                    id="cover_art"
-                    value={formData.cover_art}
-                    onChange={(e) => handleChange("cover_art", e.target.value)}
-                    className="col-span-3"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="platform" className="text-right">
-                    Platform
-                  </Label>
-                  <Select
-                    value={formData.platform}
-                    onValueChange={(value) => handleChange("platform", value)}
-                  >
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select platform" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {GAME_PLATFORMS.map((platform) => (
-                        <SelectItem key={platform} value={platform}>
-                          {platform}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="status" className="text-right">
                     Status
