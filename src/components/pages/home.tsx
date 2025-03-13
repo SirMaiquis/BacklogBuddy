@@ -159,7 +159,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-background via-muted/50 to-muted/80 overflow-hidden">
       {/* Background floating game cards */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {floatingCards}
@@ -170,7 +170,7 @@ export default function LandingPage() {
           <div className="flex items-center space-x-4">
             <Link to="/" className="font-bold text-xl flex items-center gap-2">
               <Gamepad2 className="h-5 w-5 text-primary" />
-              <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-extrabold">
+              <span className="bg-gradient-to-r from-primary via-purple-500 to-purple-600 bg-clip-text text-transparent font-extrabold">
                 Backlog Buddy
               </span>
             </Link>
@@ -221,7 +221,7 @@ export default function LandingPage() {
                   <Button variant="ghost">Sign In</Button>
                 </Link>
                 <Link to="/signup">
-                  <Button className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90">
+                  <Button className="bg-gradient-to-r from-primary via-purple-500 to-purple-600 hover:from-primary/90 hover:via-purple-500/90 hover:to-purple-600/90">
                     Get Started
                   </Button>
                 </Link>
@@ -271,7 +271,7 @@ export default function LandingPage() {
                   <Link to="/dashboard">
                     <Button
                       size="lg"
-                      className="px-8 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/20"
+                      className="px-8 bg-gradient-to-r from-primary via-purple-500 to-purple-600 hover:from-primary/90 hover:via-purple-500/90 hover:to-purple-600/90 shadow-lg shadow-primary/20"
                     >
                       Go to Dashboard
                     </Button>
@@ -281,7 +281,7 @@ export default function LandingPage() {
                     <Link to="/signup">
                       <Button
                         size="lg"
-                        className="px-8 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/20"
+                        className="px-8 bg-gradient-to-r from-primary via-purple-500 to-purple-600 hover:from-primary/90 hover:via-purple-500/90 hover:to-purple-600/90 shadow-lg shadow-primary/20"
                       >
                         Get Started <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -485,7 +485,7 @@ export default function LandingPage() {
                   <Link to="/dashboard">
                     <Button
                       size="lg"
-                      className="px-10 py-6 text-lg bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/20"
+                      className="px-10 py-6 text-lg bg-gradient-to-r from-primary via-purple-500 to-purple-600 hover:from-primary/90 hover:via-purple-500/90 hover:to-purple-600/90 shadow-lg shadow-primary/20"
                     >
                       Go to Dashboard
                     </Button>
@@ -494,7 +494,7 @@ export default function LandingPage() {
                   <Link to="/signup">
                     <Button
                       size="lg"
-                      className="px-10 py-6 text-lg bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/20"
+                      className="px-10 py-6 text-lg bg-gradient-to-r from-primary via-purple-500 to-purple-600 hover:from-primary/90 hover:via-purple-500/90 hover:to-purple-600/90 shadow-lg shadow-primary/20"
                     >
                       Get Started For Free
                     </Button>
