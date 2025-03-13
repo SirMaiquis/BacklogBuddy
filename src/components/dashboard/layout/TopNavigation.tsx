@@ -17,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "../../../../supabase/auth";
+import { useAuth } from "@/App";
 import { Link } from "react-router-dom";
 
 interface TopNavigationProps {

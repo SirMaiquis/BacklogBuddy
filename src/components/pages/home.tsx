@@ -18,7 +18,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../../supabase/auth";
+import { useAuth } from "@/App";
+// For storyboards, we can also import from the mock
+// import { useAuth } from "@/components/mocks/MockAuthProvider";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";

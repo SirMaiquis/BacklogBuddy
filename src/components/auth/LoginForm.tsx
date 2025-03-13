@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useAuth } from "../../../supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,22 +11,49 @@ import {
 import { Label } from "@/components/ui/label";
 import { useNavigate, Link } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
-import { LogIn } from "lucide-react";
+import { LogIn, KeyRound } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { signIn } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
     try {
-      await signIn(email, password);
-      navigate("/");
+      const response = await fetch(
+        "https://3wn67830-3000.use2.devtunnels.ms/auth/signin",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Invalid email or password");
+      }
+
+      const data = await response.json();
+      const userData = {
+        ...data.user,
+        access_token: data.session.access_token,
+      };
+      localStorage.setItem("user", JSON.stringify(userData));
+      window.location.href = "/dashboard";
     } catch (error) {
       setError("Invalid email or password");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -64,8 +90,16 @@ export default function LoginForm() {
               />
             </div>
             {error && <p className="text-sm text-red-500">{error}</p>}
-            <Button type="submit" className="w-full">
-              Sign in
+            <div className="flex justify-end">
+              <Link
+                to="/reset-password"
+                className="text-sm text-primary hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
         </CardContent>

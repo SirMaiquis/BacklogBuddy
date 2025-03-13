@@ -112,7 +112,7 @@ export function GameDetail() {
 
     try {
       const updatedGame = await updateGame(id, editedGame);
-      setGame(updatedGame);
+      loadGame();
       setIsEditing(false);
       toast({
         title: "Changes saved",
@@ -249,21 +249,23 @@ export function GameDetail() {
         <ArrowLeft className="mr-2 h-4 w-4" /> Back
       </Button>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
-          <Card className="custom-card">
-            <CardContent className="p-0">
-              <div className="aspect-[3/4] w-full overflow-hidden">
-                <img
-                  src={game.cover_art || defaultCoverArt}
-                  alt={game.title}
-                  className="object-cover w-full h-full"
-                />
-              </div>
-            </CardContent>
-          </Card>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex gap-6 items-start">
+          <div className="w-64 flex-shrink-0">
+            <Card className="custom-card overflow-hidden border-none shadow-xl">
+              <CardContent className="p-0">
+                <div className="aspect-[3/4] w-full overflow-hidden">
+                  <img
+                    src={game.cover_art || defaultCoverArt}
+                    alt={game.title}
+                    className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-          <Card className="custom-card mt-6">
+          <Card className="custom-card flex-1">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Game Info</CardTitle>
             </CardHeader>
@@ -374,14 +376,11 @@ export function GameDetail() {
           </Card>
         </div>
 
-        <div className="md:col-span-2 space-y-6">
+        <div className="space-y-6">
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold gradient-text">{game.title}</h1>
               <div className="flex flex-wrap gap-2 mt-2">
-                {game.platforms && game.platforms.length > 0 && (
-                  <Badge variant="outline">{game.platforms[0]}</Badge>
-                )}
                 <Badge
                   className={`
                     ${game.status === "backlog" ? "bg-slate-500" : ""}
@@ -393,6 +392,18 @@ export function GameDetail() {
                   {game.status === "playing" ? "Playing" : ""}
                   {game.status === "completed" ? "Completed" : ""}
                 </Badge>
+                {game.platforms &&
+                  game.platforms.map((platform) => (
+                    <Badge key={platform} variant="outline">
+                      {platform}
+                    </Badge>
+                  ))}
+                {game.genres &&
+                  game.genres.map((genre) => (
+                    <Badge key={genre} variant="secondary">
+                      {genre}
+                    </Badge>
+                  ))}
               </div>
             </div>
 

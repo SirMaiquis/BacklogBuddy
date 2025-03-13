@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useAuth } from "../../../supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,22 +12,57 @@ import { Label } from "@/components/ui/label";
 import { useNavigate, Link } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 import { UserPlus } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const { signUp } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
     try {
-      await signUp(email, password, fullName);
+      const response = await fetch(
+        "https://3wn67830-3000.use2.devtunnels.ms/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            metadata: {
+              name,
+            },
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error creating account");
+      }
+
+      toast({
+        title: "Account created",
+        description:
+          "Your account has been created successfully. Please sign in.",
+      });
       navigate("/login");
     } catch (error) {
-      setError("Error creating account");
+      setError(
+        error instanceof Error ? error.message : "Error creating account",
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,12 +77,12 @@ export default function SignUpForm() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
+              <Label htmlFor="name">Name</Label>
               <Input
-                id="fullName"
+                id="name"
                 placeholder="John Doe"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
@@ -75,8 +109,8 @@ export default function SignUpForm() {
               />
             </div>
             {error && <p className="text-sm text-red-500">{error}</p>}
-            <Button type="submit" className="w-full">
-              Create account
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating account..." : "Create account"}
             </Button>
           </form>
         </CardContent>

@@ -113,22 +113,24 @@ export async function createGame(game: {
 }
 
 export async function updateGame(id: string, updates: Partial<Game>) {
-  // Filter out complex objects that might cause issues with Supabase
-  const filteredUpdates = { ...updates };
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const response = await fetch(
+    `https://3wn67830-3000.use2.devtunnels.ms/games/${id}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${user.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updates),
+    },
+  );
 
-  // Handle nested objects like time_to_beat
-  if (updates.time_to_beat) {
-    filteredUpdates.time_to_beat = updates.time_to_beat;
+  if (!response.ok) {
+    throw new Error("Failed to update game");
   }
 
-  const { data, error } = await supabase
-    .from("user_games")
-    .update(filteredUpdates)
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) throw error;
+  const data = await response.json();
   return data as Game;
 }
 
