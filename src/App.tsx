@@ -141,7 +141,7 @@ function AppRoutes() {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light">
+    <ThemeProvider defaultTheme="dark">
       <AuthProvider>
         <Suspense fallback={<p>Loading...</p>}>
           <AppRoutes />

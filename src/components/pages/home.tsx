@@ -71,51 +71,77 @@ export default function LandingPage() {
   const { user, signOut } = useAuth();
   const [floatingCards, setFloatingCards] = useState<React.ReactNode[]>([]);
 
-  // Game cover images
-  const gameCovers = [
+  const [gameCovers, setGameCovers] = useState<string[]>([]);
+
+  const defaultCovers = [
+    "https://images.igdb.com/igdb/image/upload/t_cover_big/co9f4g.webp",
+    "https://images.igdb.com/igdb/image/upload/t_cover_big/co1tmu.webp",
+    "https://images.igdb.com/igdb/image/upload/t_cover_big/co5t83.webp",
+    "https://images.igdb.com/igdb/image/upload/t_cover_big/co28od.webp",
+    "https://images.igdb.com/igdb/image/upload/t_cover_big/co79j4.webp",
+    "https://images.igdb.com/igdb/image/upload/t_cover_big/co2gny.webp",
     "https://steamcdn-a.akamaihd.net/steam/apps/1086940/library_600x900_2x.jpg",
     "https://steamcdn-a.akamaihd.net/steam/apps/1174180/library_600x900_2x.jpg",
     "https://steamcdn-a.akamaihd.net/steam/apps/413150/library_600x900_2x.jpg",
     "https://steamcdn-a.akamaihd.net/steam/apps/526870/library_600x900_2x.jpg",
-    "https://steamcdn-a.akamaihd.net/steam/apps/367520/library_600x900_2x.jpg",
-    "https://steamcdn-a.akamaihd.net/steam/apps/105600/library_600x900_2x.jpg",
-    "https://steamcdn-a.akamaihd.net/steam/apps/250900/library_600x900_2x.jpg",
-    "https://steamcdn-a.akamaihd.net/steam/apps/322330/library_600x900_2x.jpg",
-    "https://steamcdn-a.akamaihd.net/steam/apps/208650/library_600x900_2x.jpg",
-    "https://steamcdn-a.akamaihd.net/steam/apps/255710/library_600x900_2x.jpg",
   ];
+
+  useEffect(() => {
+    const fetchGameCovers = async () => {
+      try {
+        const headers: HeadersInit = {};
+        if (user?.access_token) {
+          headers.Authorization = `Bearer ${user.access_token}`;
+        }
+        const response = await fetch(
+          "https://3wn67830-3000.use2.devtunnels.ms/landing",
+          { headers },
+        );
+        if (!response.ok) throw new Error("Failed to fetch game covers");
+        const data = await response.json();
+        setGameCovers(data.gamesCovers);
+      } catch (error) {
+        console.error("Error fetching game covers:", error);
+        setGameCovers(defaultCovers);
+      }
+    };
+
+    fetchGameCovers();
+  }, []);
 
   // Generate floating cards on component mount
   useEffect(() => {
-    const cards = [];
-    // Create 12 floating cards with random positions
-    for (let i = 0; i < 12; i++) {
-      // Ensure cards are distributed across the viewport
-      const section = Math.floor(i / 3); // Divide viewport into 4 sections
-      const xMin = (section % 2) * 50; // Left or right half
-      const xMax = xMin + 50;
-      const yMin = Math.floor(section / 2) * 50; // Top or bottom half
-      const yMax = yMin + 50;
+    if (gameCovers.length > 0) {
+      const cards = [];
+      // Create 16 floating cards with random positions
+      for (let i = 0; i < 16; i++) {
+        // Ensure cards are distributed across the viewport
+        const section = Math.floor(i / 3); // Divide viewport into 4 sections
+        const xMin = (section % 2) * 50; // Left or right half
+        const xMax = xMin + 50;
+        const yMin = Math.floor(section / 2) * 50; // Top or bottom half
+        const yMax = yMin + 50;
 
-      const x = xMin + Math.random() * (xMax - xMin); // Position within section
-      const y = yMin + Math.random() * (yMax - yMin);
-      const delay = Math.random() * 5; // Random delay (0-5s)
-      const image = gameCovers[i % gameCovers.length]; // Cycle through available images
-      const rotation = (Math.random() - 0.5) * 20; // Random rotation (-10 to 10 degrees)
+        const x = xMin + Math.random() * (xMax - xMin); // Position within section
+        const y = yMin + Math.random() * (yMax - yMin);
+        const delay = Math.random() * 5; // Random delay (0-5s)
+        const image = gameCovers[i % gameCovers.length]; // Cycle through available images
+        const rotation = (Math.random() - 0.5) * 20; // Random rotation (-10 to 10 degrees)
 
-      cards.push(
-        <FloatingGameCard
-          key={i}
-          x={x}
-          y={y}
-          delay={delay}
-          image={image}
-          rotation={rotation}
-        />,
-      );
+        cards.push(
+          <FloatingGameCard
+            key={i}
+            x={x}
+            y={y}
+            delay={delay}
+            image={image}
+            rotation={rotation}
+          />,
+        );
+      }
+      setFloatingCards(cards);
     }
-    setFloatingCards(cards);
-  }, []);
+  }, [gameCovers]);
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
