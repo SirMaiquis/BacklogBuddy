@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function TopNavigation() {
+export function Header() {
   const { user, signOut } = useAuth();
 
   if (!user) return null;

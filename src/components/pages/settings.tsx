@@ -26,6 +26,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import { Header } from "@/components/layout/Header";
 
 interface GamingAccount {
   platform: string;
@@ -142,19 +143,7 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <Gamepad2 className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              Backlog Buddy
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className="container mx-auto p-6 max-w-3xl">
         <Button variant="outline" onClick={() => navigate(-1)} className="mb-6">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { GameTabs } from "@/components/games/GameTabs";
 import { GameStats } from "@/components/games/GameStats";
-import TopNavigation from "@/components/dashboard/layout/TopNavigation";
+import { Header } from "@/components/layout/Header";
 import { useAuth } from "@/App";
 import { Game } from "@/types/game";
 import { fetchGames } from "@/lib/api";
@@ -31,7 +31,7 @@ export default function BacklogDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <TopNavigation />
+      <Header />
       <div className="container mx-auto p-6 pt-24 space-y-8">
         <GameStats games={games} />
         <GameTabs />
