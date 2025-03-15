@@ -6,7 +6,7 @@ import {
   useEffect,
 } from "react";
 import { Navigate, Route, Routes, useRoutes } from "react-router-dom";
-import routes from "tempo-routes";
+import routes from "./tempo-routes";
 import LoginForm from "./components/auth/LoginForm";
 import SignUpForm from "./components/auth/SignUpForm";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
@@ -29,6 +29,8 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signOut: async () => {},
 });
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export function useAuth() {
   return useContext(AuthContext);
@@ -54,16 +56,13 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/signout",
-        {
-          method: "POST",
-          headers: {
+      const response = await fetch(`${API_URL}/auth/signout`, {
+        method: "POST",
+        headers: {
             Authorization: `Bearer ${user?.access_token}`,
-            "Content-Type": "application/json",
-          },
+          "Content-Type": "application/json",
         },
-      );
+      });
 
       if (!response.ok) {
         throw new Error("Failed to sign out");

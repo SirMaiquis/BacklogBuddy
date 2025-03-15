@@ -1,18 +1,16 @@
 import { supabase } from "../../supabase/supabase";
 import { Game, GameNote, ExternalGameProvider } from "../types/game";
 
-// Game CRUD operations
+const API_URL = import.meta.env.VITE_API_URL;
+
 export async function fetchGames() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const response = await fetch(
-    "https://3wn67830-3000.use2.devtunnels.ms/games",
-    {
-      headers: {
-        Authorization: `Bearer ${user.access_token}`,
-        "Content-Type": "application/json",
-      },
+  const response = await fetch(`${API_URL}/games`, {
+    headers: {
+      Authorization: `Bearer ${user.access_token}`,
+      "Content-Type": "application/json",
     },
-  );
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch games");
@@ -35,15 +33,12 @@ export async function fetchGamesByStatus(status: string) {
 
 export async function fetchGame(id: string) {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const response = await fetch(
-    `https://3wn67830-3000.use2.devtunnels.ms/games/details/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${user.access_token}`,
-        "Content-Type": "application/json",
-      },
+  const response = await fetch(`${API_URL}/games/details/${id}`, {
+    headers: {
+      Authorization: `Bearer ${user.access_token}`,
+      "Content-Type": "application/json",
     },
-  );
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch game details");
@@ -56,13 +51,13 @@ export async function fetchGame(id: string) {
 export async function fetchExternalGames(search: string = "") {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const response = await fetch(
-    `https://3wn67830-3000.use2.devtunnels.ms/games/search?name=${encodeURIComponent(search)}`,
+    `${API_URL}/games/search?name=${encodeURIComponent(search)}`,
     {
       headers: {
         Authorization: `Bearer ${user.access_token}`,
         "Content-Type": "application/json",
       },
-    },
+    }
   );
 
   if (!response.ok) {
@@ -92,17 +87,14 @@ export async function createGame(game: {
   igdb_id: number;
 }) {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const response = await fetch(
-    "https://3wn67830-3000.use2.devtunnels.ms/games",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${user.access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(game),
+  const response = await fetch(`${API_URL}/games`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${user.access_token}`,
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify(game),
+  });
 
   if (!response.ok) {
     throw new Error("Failed to create game");
@@ -114,17 +106,14 @@ export async function createGame(game: {
 
 export async function updateGame(id: string, updates: Partial<Game>) {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const response = await fetch(
-    `https://3wn67830-3000.use2.devtunnels.ms/games/${id}`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${user.access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updates),
+  const response = await fetch(`${API_URL}/games/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${user.access_token}`,
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify(updates),
+  });
 
   if (!response.ok) {
     throw new Error("Failed to update game");

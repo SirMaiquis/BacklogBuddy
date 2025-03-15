@@ -26,6 +26,8 @@ export default function ResetPasswordForm() {
   const location = useLocation();
   const { toast } = useToast();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     // Check if we have a token in the URL hash
     const hash = location.hash;
@@ -49,16 +51,13 @@ export default function ResetPasswordForm() {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/reset-password",
-        {
-          method: "POST",
-          headers: {
+      const response = await fetch(`${API_URL}/auth/reset-password`, {
+        method: "POST",
+        headers: {
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        },
-      );
+            },
+        body: JSON.stringify({ email }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to request password reset");
@@ -92,16 +91,15 @@ export default function ResetPasswordForm() {
 
     try {
       const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/confirm-reset-password",
+        `${API_URL}/auth/confirm-reset-password`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${resetToken}`,
           },
-          body: JSON.stringify({ newPassword }),
-        },
-      );
+        body: JSON.stringify({ newPassword }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to reset password");

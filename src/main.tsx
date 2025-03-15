@@ -4,8 +4,12 @@ import App from "./App.tsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 
-import { TempoDevtools } from "tempo-devtools";
-TempoDevtools.init();
+// Only import and initialize TempoDevtools if VITE_TEMPO is true
+if (import.meta.env.VITE_TEMPO === "true") {
+  import("tempo-devtools").then(({ TempoDevtools }) => {
+    TempoDevtools.init();
+  });
+}
 
 const basename = import.meta.env.BASE_URL;
 

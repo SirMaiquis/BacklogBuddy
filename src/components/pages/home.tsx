@@ -25,6 +25,8 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // Floating game card component
 const FloatingGameCard = ({
   x,
@@ -74,16 +76,16 @@ export default function LandingPage() {
   const [gameCovers, setGameCovers] = useState<string[]>([]);
 
   const defaultCovers = [
-    "https://images.igdb.com/igdb/image/upload/t_cover_big/co9f4g.webp",
-    "https://images.igdb.com/igdb/image/upload/t_cover_big/co1tmu.webp",
-    "https://images.igdb.com/igdb/image/upload/t_cover_big/co5t83.webp",
-    "https://images.igdb.com/igdb/image/upload/t_cover_big/co28od.webp",
-    "https://images.igdb.com/igdb/image/upload/t_cover_big/co79j4.webp",
-    "https://images.igdb.com/igdb/image/upload/t_cover_big/co2gny.webp",
-    "https://steamcdn-a.akamaihd.net/steam/apps/1086940/library_600x900_2x.jpg",
-    "https://steamcdn-a.akamaihd.net/steam/apps/1174180/library_600x900_2x.jpg",
-    "https://steamcdn-a.akamaihd.net/steam/apps/413150/library_600x900_2x.jpg",
-    "https://steamcdn-a.akamaihd.net/steam/apps/526870/library_600x900_2x.jpg",
+    'https://steamcdn-a.akamaihd.net/steam/apps/1086940/library_600x900_2x.jpg',
+    'https://steamcdn-a.akamaihd.net/steam/apps/1174180/library_600x900_2x.jpg',
+    'https://steamcdn-a.akamaihd.net/steam/apps/413150/library_600x900_2x.jpg',
+    'https://steamcdn-a.akamaihd.net/steam/apps/526870/library_600x900_2x.jpg',
+    'https://steamcdn-a.akamaihd.net/steam/apps/367520/library_600x900_2x.jpg',
+    'https://steamcdn-a.akamaihd.net/steam/apps/105600/library_600x900_2x.jpg',
+    'https://steamcdn-a.akamaihd.net/steam/apps/250900/library_600x900_2x.jpg',
+    'https://steamcdn-a.akamaihd.net/steam/apps/322330/library_600x900_2x.jpg',
+    'https://steamcdn-a.akamaihd.net/steam/apps/208650/library_600x900_2x.jpg',
+    'https://steamcdn-a.akamaihd.net/steam/apps/255710/library_600x900_2x.jpg',
   ];
 
   useEffect(() => {
@@ -93,10 +95,7 @@ export default function LandingPage() {
         if (user?.access_token) {
           headers.Authorization = `Bearer ${user.access_token}`;
         }
-        const response = await fetch(
-          "https://3wn67830-3000.use2.devtunnels.ms/landing",
-          { headers },
-        );
+        const response = await fetch(`${API_URL}/landing`, { headers });
         if (!response.ok) throw new Error("Failed to fetch game covers");
         const data = await response.json();
         setGameCovers(data.gamesCovers);

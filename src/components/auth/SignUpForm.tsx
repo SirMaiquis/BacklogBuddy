@@ -23,17 +23,17 @@ export default function SignUpForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/signup",
-        {
-          method: "POST",
-          headers: {
+      const response = await fetch(`${API_URL}/auth/signup`, {
+        method: "POST",
+        headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -43,8 +43,7 @@ export default function SignUpForm() {
               name,
             },
           }),
-        },
-      );
+      });
 
       if (!response.ok) {
         const errorData = await response.json();

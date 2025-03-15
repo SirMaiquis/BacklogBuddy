@@ -22,22 +22,21 @@ export default function LoginForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/signin",
-        {
-          method: "POST",
-          headers: {
+      const response = await fetch(`${API_URL}/auth/signin`, {
+        method: "POST",
+        headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password }),
-        },
-      );
+        body: JSON.stringify({ email, password }),
+      });
 
       if (!response.ok) {
         throw new Error("Invalid email or password");

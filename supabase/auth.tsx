@@ -13,6 +13,8 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,16 +51,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const response = await fetch(
-      "https://3wn67830-3000.use2.devtunnels.ms/auth/signin",
-      {
-        method: "POST",
-        headers: {
+    const response = await fetch(`${API_URL}/auth/signin`, {
+      method: "POST",
+      headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
-      },
-    );
+      body: JSON.stringify({ email, password }),
+    });
 
     if (!response.ok) {
       throw new Error("Failed to sign in");
@@ -72,16 +71,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    const response = await fetch(
-      "https://3wn67830-3000.use2.devtunnels.ms/auth/signout",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${user?.access_token}`,
-          "Content-Type": "application/json",
-        },
+    const response = await fetch(`${API_URL}/auth/signout`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user?.access_token}`,
+        "Content-Type": "application/json",
       },
-    );
+    });
 
     if (!response.ok) {
       throw new Error("Failed to sign out");
