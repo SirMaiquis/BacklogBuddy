@@ -1,6 +1,6 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
 import { Avatar } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -91,7 +91,7 @@ const ActivityFeed = ({
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold">Activity Feed</h2>
       </div>
-      <ScrollArea className="h-[calc(100%-60px)]">
+      <CustomScrollArea className="h-[calc(100%-60px)]">
         <div className="p-4">
           {activities.map((activity, index) => (
             <div key={activity.id}>
@@ -127,7 +127,7 @@ const ActivityFeed = ({
             </div>
           ))}
         </div>
-      </ScrollArea>
+      </CustomScrollArea>
     </Card>
   );
 };

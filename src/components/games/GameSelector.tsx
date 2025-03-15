@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, Star } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
 
 interface GameSelectorProps {
   onSelect: (game: any) => void;
@@ -69,51 +70,56 @@ export function GameSelector({ onSelect, onCancel }: GameSelectorProps) {
           ))}
         </div>
       ) : (
-        <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-          {games.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              No games found. Try a different search term.
-            </p>
-          ) : (
-            games.map((game) => (
-              <Card
-                key={game.id}
-                className="hover:bg-accent/50 cursor-pointer transition-colors"
-                onClick={() => onSelect(game)}
-              >
-                <CardContent className="p-4 flex gap-4">
-                  <div className="w-16 h-20 overflow-hidden rounded-md flex-shrink-0">
-                    <img
-                      src={game.cover_art}
-                      alt={game.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-grow">
-                    <h3 className="font-medium">{game.title}</h3>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                      <span>{game.rating}</span>
-                      <Separator orientation="vertical" className="h-3 mx-1" />
-                      <span>{game.platform}</span>
+        <CustomScrollArea className="h-[400px]">
+          <div className="space-y-2 pr-2">
+            {games.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">
+                No games found. Try a different search term.
+              </p>
+            ) : (
+              games.map((game) => (
+                <Card
+                  key={game.id}
+                  className="hover:bg-accent/50 cursor-pointer transition-colors"
+                  onClick={() => onSelect(game)}
+                >
+                  <CardContent className="p-4 flex gap-4">
+                    <div className="w-16 h-20 overflow-hidden rounded-md flex-shrink-0">
+                      <img
+                        src={game.cover_art}
+                        alt={game.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {game.genres?.slice(0, 3).map((genre: string) => (
-                        <Badge
-                          key={genre}
-                          variant="outline"
-                          className="text-xs"
-                        >
-                          {genre}
-                        </Badge>
-                      ))}
+                    <div className="flex-grow">
+                      <h3 className="font-medium">{game.title}</h3>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        <span>{game.rating}</span>
+                        <Separator
+                          orientation="vertical"
+                          className="h-3 mx-1"
+                        />
+                        <span>{game.platform}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {game.genres?.slice(0, 3).map((genre: string) => (
+                          <Badge
+                            key={genre}
+                            variant="outline"
+                            className="text-xs"
+                          >
+                            {genre}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </CustomScrollArea>
       )}
 
       <div className="flex justify-end gap-2 pt-2">

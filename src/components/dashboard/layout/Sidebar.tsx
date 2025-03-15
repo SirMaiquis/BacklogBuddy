@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
   Home,
@@ -52,7 +52,7 @@ const Sidebar = ({
         </p>
       </div>
 
-      <ScrollArea className="flex-1 px-4">
+      <CustomScrollArea className="flex-1 px-4">
         <div className="space-y-2">
           {items.map((item) => (
             <Button
@@ -81,7 +81,7 @@ const Sidebar = ({
             🟡 In Progress
           </Button>
         </div>
-      </ScrollArea>
+      </CustomScrollArea>
 
       <div className="p-4 mt-auto border-t">
         {defaultBottomItems.map((item) => (
