@@ -286,7 +286,7 @@ export default function Settings() {
                       ) : (
                         <Button
                           size="sm"
-                          className={account.color}
+                          className={`${account.color} text-white dark:text-white`}
                           onClick={() => handleConnectAccount(account.platform)}
                         >
                           <ExternalLink className="mr-2 h-4 w-4" />
