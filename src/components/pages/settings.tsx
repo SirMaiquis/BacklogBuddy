@@ -174,6 +174,11 @@ export default function Settings() {
   };
 
   const handleDisconnectAccount = async (platform: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to disconnect your ${platform} account? This will remove access to your ${platform.toLowerCase()} games library.`,
+    );
+    if (!confirmed) return;
+
     if (platform === "Steam") {
       try {
         const response = await fetch(
@@ -216,6 +221,25 @@ export default function Settings() {
       description: `${platform} integration will be available soon!`,
     });
   };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto p-6 max-w-3xl">
+          <div className="space-y-6">
+            <div className="h-10 w-24 bg-muted rounded animate-pulse" />
+            <div className="h-8 w-48 bg-muted rounded animate-pulse" />
+            <div className="space-y-4">
+              <div className="h-[200px] bg-muted rounded animate-pulse" />
+              <div className="h-[300px] bg-muted rounded animate-pulse" />
+              <div className="h-[200px] bg-muted rounded animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

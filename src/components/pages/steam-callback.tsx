@@ -10,6 +10,8 @@ export default function SteamCallback() {
   const { toast } = useToast();
 
   useEffect(() => {
+    let timeoutId: number;
+
     const handleCallback = async () => {
       try {
         const response = await fetch(
@@ -30,7 +32,9 @@ export default function SteamCallback() {
           description: "Steam account connected successfully!",
         });
 
-        navigate("/settings");
+        timeoutId = setTimeout(() => {
+          navigate("/settings");
+        }, 5000);
       } catch (error) {
         console.error("Steam callback error:", error);
         toast({
@@ -38,11 +42,15 @@ export default function SteamCallback() {
           description: "Failed to connect Steam account. Please try again.",
           variant: "destructive",
         });
-        navigate("/settings");
+        timeoutId = setTimeout(() => {
+          navigate("/settings");
+        }, 5000);
       }
     };
 
     handleCallback();
+
+    return () => clearTimeout(timeoutId);
   }, [location.search, user, navigate, toast]);
 
   return (
