@@ -124,10 +124,24 @@ export async function updateGame(id: string, updates: Partial<Game>) {
 }
 
 export async function deleteGame(id: string) {
-  const { error } = await supabase.from("user_games").delete().eq("id", id);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const response = await fetch(
+    `https://3wn67830-3000.use2.devtunnels.ms/games/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${user.access_token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
 
-  if (error) throw error;
-  return true;
+  if (!response.ok) {
+    throw new Error("Failed to update game");
+  }
+
+  const data = await response.json();
+  return data;
 }
 
 // External game providers

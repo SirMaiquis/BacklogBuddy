@@ -2,14 +2,41 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Game } from "@/types/game";
-import { Clock, Trophy, Star } from "lucide-react";
+import {
+  Clock,
+  Trophy,
+  Star,
+  ListTodo,
+  PlayCircle,
+  CheckCircle2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { updateGame } from "@/lib/api";
 
 interface GameCardProps {
   game: Game;
   onClick?: () => void;
+  onUpdate?: (updatedGame: Game) => void;
 }
 
-export function GameCard({ game, onClick }: GameCardProps) {
+export function GameCard({ game, onClick, onUpdate }: GameCardProps) {
+  const handleStatusChange = async (status: Game["status"]) => {
+    if (!onUpdate) return;
+    const updated = await updateGame(game.id, { status });
+    onUpdate(updated);
+  };
+
+  const handleFavoriteToggle = async () => {
+    if (!onUpdate) return;
+    const updated = await updateGame(game.id, { favorite: !game.favorite });
+    onUpdate(updated);
+  };
   const defaultCoverArt =
     "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&q=80";
 
@@ -22,15 +49,75 @@ export function GameCard({ game, onClick }: GameCardProps) {
 
   return (
     <Card
-      className={`overflow-hidden hover:shadow-lg transition-all cursor-pointer h-full flex flex-col border-t-4 ${statusColors[game.status]} transform hover:-translate-y-1`}
-      onClick={onClick}
+      className={`overflow-hidden hover:shadow-lg transition-all h-full flex flex-col border-t-4 ${statusColors[game.status]} transform hover:-translate-y-1`}
     >
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted/30">
-        <img
-          src={game.cover_art || defaultCoverArt}
-          alt={game.title}
-          className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-        />
+      <div className="group relative aspect-[3/4] w-full overflow-hidden bg-muted/30">
+        <div className="absolute top-2 right-2 flex gap-2 z-10">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {game.status === "backlog" && <ListTodo className="h-4 w-4" />}
+                {game.status === "playing" && (
+                  <PlayCircle className="h-4 w-4" />
+                )}
+                {game.status === "completed" && (
+                  <CheckCircle2 className="h-4 w-4" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStatusChange("backlog");
+                }}
+              >
+                <ListTodo className="h-4 w-4 mr-2" /> Move to Backlog
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStatusChange("playing");
+                }}
+              >
+                <PlayCircle className="h-4 w-4 mr-2" /> Start Playing
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStatusChange("completed");
+                }}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" /> Mark as Completed
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            variant="secondary"
+            size="sm"
+            className={`opacity-0 group-hover:opacity-100 transition-opacity ${game.favorite ? "bg-yellow-100 hover:bg-yellow-200" : ""}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFavoriteToggle();
+            }}
+          >
+            <Star
+              className={`h-4 w-4 ${game.favorite ? "fill-yellow-400 text-yellow-400" : ""}`}
+            />
+          </Button>
+        </div>
+        <div onClick={onClick} className="cursor-pointer">
+          <img
+            src={game.cover_art || defaultCoverArt}
+            alt={game.title}
+            className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
+          />
+        </div>
         <div className="absolute top-2 right-2">
           <Badge
             className={`

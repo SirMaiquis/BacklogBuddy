@@ -27,6 +27,12 @@ export function GameGrid({
     navigate(`/games/${gameId}`);
   };
 
+  const handleGameUpdate = (updatedGame: Game) => {
+    setDisplayGames((currentGames) =>
+      currentGames.map((g) => (g.id === updatedGame.id ? updatedGame : g)),
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -59,6 +65,7 @@ export function GameGrid({
           key={game.id}
           game={game}
           onClick={() => handleGameClick(game.id)}
+          onUpdate={handleGameUpdate}
         />
       ))}
     </div>

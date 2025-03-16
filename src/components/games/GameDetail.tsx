@@ -343,7 +343,7 @@ export function GameDetail() {
                           <Zap className="h-3 w-3 text-amber-500" /> Hastily
                         </div>
                         <span>
-                          {Math.round(game.time_to_beat.hastily / 3600)} hours
+                          {Math.round(game.time_to_beat.hastily)} hours
                         </span>
                       </div>
                     )}
@@ -353,7 +353,7 @@ export function GameDetail() {
                           <Clock className="h-3 w-3 text-blue-500" /> Normally
                         </div>
                         <span>
-                          {Math.round(game.time_to_beat.normally / 3600)} hours
+                          {Math.round(game.time_to_beat.normally)} hours
                         </span>
                       </div>
                     )}
@@ -364,8 +364,7 @@ export function GameDetail() {
                           Completionist
                         </div>
                         <span>
-                          {Math.round(game.time_to_beat.completionist / 3600)}{" "}
-                          hours
+                          {Math.round(game.time_to_beat.completionist)} hours
                         </span>
                       </div>
                     )}
