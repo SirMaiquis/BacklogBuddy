@@ -173,6 +173,53 @@ export default function Settings() {
     });
   };
 
+  const [isImporting, setIsImporting] = useState(false);
+
+  const handleImportGames = async (platform: string) => {
+    if (platform === "Steam") {
+      const confirmed = window.confirm(
+        "Are you sure you want to import your Steam games? This will add all your Steam games to your Backlog Buddy collection.",
+      );
+      if (!confirmed) return;
+
+      try {
+        setIsImporting(true);
+        toast({
+          title: "Import Started",
+          description:
+            "We're importing your Steam games. This process runs in the background and may take up to 10 minutes. You can continue using the app normally.",
+        });
+
+        const response = await fetch(
+          "https://3wn67830-3000.use2.devtunnels.ms/games/steam",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${user?.access_token}`,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to start game import");
+        }
+      } catch (error) {
+        console.error("Steam import error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to start game import. Please try again.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
+    toast({
+      title: "Coming Soon",
+      description: `${platform} integration will be available soon!`,
+    });
+  };
+
   const handleDisconnectAccount = async (platform: string) => {
     const confirmed = window.confirm(
       `Are you sure you want to disconnect your ${platform} account? This will remove access to your ${platform.toLowerCase()} games library.`,
@@ -374,15 +421,25 @@ export default function Settings() {
                         </div>
                       </div>
                       {account.isConnected ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleDisconnectAccount(account.platform)
-                          }
-                        >
-                          Disconnect
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleImportGames(account.platform)}
+                            disabled={isImporting}
+                          >
+                            {isImporting ? "Importing..." : "Import Games"}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleDisconnectAccount(account.platform)
+                            }
+                          >
+                            Disconnect
+                          </Button>
+                        </div>
                       ) : (
                         <Button
                           size="sm"
