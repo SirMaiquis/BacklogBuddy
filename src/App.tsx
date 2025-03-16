@@ -11,6 +11,7 @@ import LoginForm from "./components/auth/LoginForm";
 import SignUpForm from "./components/auth/SignUpForm";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import Success from "./components/pages/success";
+import SteamCallback from "./components/pages/steam-callback";
 import Home from "./components/pages/home";
 import BacklogDashboard from "./components/pages/backlog-dashboard";
 import GameDetailPage from "./components/pages/game-detail-page";
@@ -30,16 +31,15 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
 });
 
-export function useAuth() {
+export const useAuth = () => {
   return useContext(AuthContext);
-}
+};
 
-function AuthProvider({ children }: { children: React.ReactNode }) {
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is stored in localStorage
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
@@ -73,7 +73,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
     } catch (error) {
       console.error("Sign out error:", error);
-      // Even if the API call fails, remove the user from local storage
       localStorage.removeItem("user");
       setUser(null);
     }
@@ -84,9 +83,9 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -98,9 +97,9 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
-}
+};
 
-function AppRoutes() {
+const AppRoutes = () => {
   return (
     <>
       <Routes>
@@ -133,13 +132,14 @@ function AppRoutes() {
           }
         />
         <Route path="/success" element={<Success />} />
+        <Route path="/auth/steam" element={<SteamCallback />} />
       </Routes>
       {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
     </>
   );
-}
+};
 
-function App() {
+const App = () => {
   return (
     <ThemeProvider defaultTheme="dark">
       <AuthProvider>
@@ -150,6 +150,6 @@ function App() {
       </AuthProvider>
     </ThemeProvider>
   );
-}
+};
 
 export default App;

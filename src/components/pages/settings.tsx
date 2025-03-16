@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/App";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +34,7 @@ interface GamingAccount {
   isConnected: boolean;
   logo: string;
   color: string;
+  disabled?: boolean;
 }
 
 export default function Settings() {
@@ -54,27 +55,69 @@ export default function Settings() {
       color: "bg-[#171a21]",
     },
     {
-      platform: "PlayStation Network",
+      platform: "PlayStation Network (Coming Soon)",
       username: "",
       isConnected: false,
       logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/PlayStation_logo.svg/2560px-PlayStation_logo.svg.png",
       color: "bg-[#0070d1]",
+      disabled: true,
     },
     {
-      platform: "Xbox Live",
+      platform: "Xbox Live (Coming Soon)",
       username: "",
       isConnected: false,
       logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Xbox_one_logo.svg/1024px-Xbox_one_logo.svg.png",
       color: "bg-[#107c10]",
+      disabled: true,
     },
     {
-      platform: "Nintendo",
+      platform: "Nintendo (Coming Soon)",
       username: "",
       isConnected: false,
       logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Nintendo.svg/1024px-Nintendo.svg.png",
       color: "bg-[#e60012]",
+      disabled: true,
     },
   ]);
+
+  // Load profile and connected accounts on mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const response = await fetch(
+          `https://3wn67830-3000.use2.devtunnels.ms/profile`,
+          {
+            headers: {
+              Authorization: `Bearer ${user?.access_token}`,
+            },
+          },
+        );
+
+        if (!response.ok) throw new Error("Failed to load profile");
+
+        const data = await response.json();
+
+        setAccounts(
+          accounts.map((account) => {
+            if (account.platform === "Steam" && data.steam_id) {
+              return {
+                ...account,
+                isConnected: true,
+                username: data.steam_id,
+              };
+            }
+            return account;
+          }),
+        );
+      } catch (error) {
+        console.error("Error loading profile:", error);
+      }
+    };
+
+    if (user?.access_token) {
+      loadProfile();
+    }
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,47 +140,80 @@ export default function Settings() {
     }
   };
 
-  const handleConnectAccount = (platform: string) => {
-    // In a real app, this would redirect to the platform's OAuth flow
-    // For demo purposes, we'll just simulate a connection
+  const handleConnectAccount = async (platform: string) => {
+    if (platform === "Steam") {
+      try {
+        const response = await fetch(
+          `https://3wn67830-3000.use2.devtunnels.ms/profile/steam/auth`,
+          {
+            headers: {
+              Authorization: `Bearer ${user?.access_token}`,
+            },
+          },
+        );
+
+        if (!response.ok) throw new Error("Failed to initiate Steam auth");
+
+        const { url } = await response.json();
+        window.location.href = url;
+      } catch (error) {
+        console.error("Steam auth error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to connect Steam account. Please try again.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
     toast({
-      title: "Connecting account",
-      description: `Redirecting to ${platform} for authentication...`,
+      title: "Coming Soon",
+      description: `${platform} integration will be available soon!`,
     });
-
-    // Simulate successful connection after a delay
-    setTimeout(() => {
-      setAccounts(
-        accounts.map((account) =>
-          account.platform === platform
-            ? {
-                ...account,
-                isConnected: true,
-                username: `${user?.email?.split("@")[0] || "user"}#${Math.floor(Math.random() * 10000)}`,
-              }
-            : account,
-        ),
-      );
-
-      toast({
-        title: "Account connected",
-        description: `Your ${platform} account has been successfully linked.`,
-      });
-    }, 1500);
   };
 
-  const handleDisconnectAccount = (platform: string) => {
-    setAccounts(
-      accounts.map((account) =>
-        account.platform === platform
-          ? { ...account, isConnected: false, username: "" }
-          : account,
-      ),
-    );
+  const handleDisconnectAccount = async (platform: string) => {
+    if (platform === "Steam") {
+      try {
+        const response = await fetch(
+          "https://3wn67830-3000.use2.devtunnels.ms/profile/steam/auth",
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${user?.access_token}`,
+            },
+          },
+        );
+
+        if (!response.ok) throw new Error("Failed to disconnect Steam account");
+
+        setAccounts(
+          accounts.map((account) =>
+            account.platform === platform
+              ? { ...account, isConnected: false, username: "" }
+              : account,
+          ),
+        );
+
+        toast({
+          title: "Account disconnected",
+          description: "Your Steam account has been unlinked.",
+        });
+      } catch (error) {
+        console.error("Steam disconnect error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to disconnect Steam account. Please try again.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
 
     toast({
-      title: "Account disconnected",
-      description: `Your ${platform} account has been unlinked.`,
+      title: "Coming Soon",
+      description: `${platform} integration will be available soon!`,
     });
   };
 
@@ -288,9 +364,10 @@ export default function Settings() {
                           size="sm"
                           className={`${account.color} text-white dark:text-white`}
                           onClick={() => handleConnectAccount(account.platform)}
+                          disabled={account.disabled}
                         >
                           <ExternalLink className="mr-2 h-4 w-4" />
-                          Connect
+                          {account.disabled ? "Soon" : "Connect"}
                         </Button>
                       )}
                     </div>
