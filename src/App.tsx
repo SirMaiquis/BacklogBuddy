@@ -18,6 +18,7 @@ import GameDetailPage from "./components/pages/game-detail-page";
 import Settings from "./components/pages/settings";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { BacklogBuddyApiClient } from "./lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
 
 type AuthContextType = {
   user: any | null;
@@ -54,18 +55,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
-      const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/signout",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${user?.access_token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      const backlogBuddyApiClient = new BacklogBuddyApiClient();
+      const response = await backlogBuddyApiClient.signOut({
+        authorizationToken: user.session.access_token,
+      });
 
-      if (!response.ok) {
+      if (!response?.success) {
         throw new Error("Failed to sign out");
       }
 

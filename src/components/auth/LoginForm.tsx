@@ -13,6 +13,7 @@ import { useNavigate, Link } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 import { LogIn, KeyRound } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -28,25 +29,19 @@ export default function LoginForm() {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/signin",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        },
-      );
+      const backlogBuddyApiClient = new BacklogBuddyApiClient();
+      const response = await backlogBuddyApiClient.signIn({
+        email,
+        password,
+      });
 
-      if (!response.ok) {
+      if (!response?.user?.id) {
         throw new Error("Invalid email or password");
       }
 
-      const data = await response.json();
       const userData = {
-        ...data.user,
-        access_token: data.session.access_token,
+        ...response.user,
+        access_token: response.session.access_token,
       };
       localStorage.setItem("user", JSON.stringify(userData));
       window.location.href = "/dashboard";

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
+import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
 
 type AuthContextType = {
   user: User | null;
@@ -49,41 +50,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const response = await fetch(
-      "https://3wn67830-3000.use2.devtunnels.ms/auth/signin",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      },
-    );
+    const backlogBuddyApiClient = new BacklogBuddyApiClient();
+    const response = await backlogBuddyApiClient.signIn({
+      email,
+      password,
+    });
 
-    if (!response.ok) {
+    if (!response?.user?.id) {
       throw new Error("Failed to sign in");
     }
-
-    const data = await response.json();
-    const userData = { ...data.user, access_token: data.session.access_token };
+    const userData = {
+      ...response.user,
+      access_token: response.session.access_token,
+    };
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
-    return data;
+    return userData;
   };
 
   const signOut = async () => {
-    const response = await fetch(
-      "https://3wn67830-3000.use2.devtunnels.ms/auth/signout",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${user?.access_token}`,
-          "Content-Type": "application/json",
-        },
-      },
-    );
+    const backlogBuddyApiClient = new BacklogBuddyApiClient();
+    const response = await backlogBuddyApiClient.signOut({
+      authorizationToken: user?.access_token,
+    });
 
-    if (!response.ok) {
+    if (!response?.success) {
       throw new Error("Failed to sign out");
     }
 
