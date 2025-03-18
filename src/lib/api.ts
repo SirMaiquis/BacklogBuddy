@@ -125,16 +125,13 @@ export async function updateGame(id: string, updates: Partial<Game>) {
 
 export async function deleteGame(id: string) {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const response = await fetch(
-    `https://3wn67830-3000.use2.devtunnels.ms/games/${id}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${user.access_token}`,
-        "Content-Type": "application/json",
-      },
+  const response = await fetch(`${API_URL}/games/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${user.access_token}`,
+      "Content-Type": "application/json",
     },
-  );
+  });
 
   if (!response.ok) {
     throw new Error("Failed to update game");

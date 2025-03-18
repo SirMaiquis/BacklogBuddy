@@ -19,7 +19,7 @@ export function WelcomeMessage({ onDismiss }: WelcomeMessageProps) {
           <Button>Let's import them</Button>
         </Link>
         <Button variant="outline" onClick={onDismiss}>
-          Nah, I'm good
+          Nah, I'd win 🗿
         </Button>
       </div>
     </Card>

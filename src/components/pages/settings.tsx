@@ -82,10 +82,11 @@ export default function Settings() {
 
   // Load profile and connected accounts on mount
   useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL;
     const loadProfile = async () => {
       try {
         const response = await fetch(
-          `https://3wn67830-3000.use2.devtunnels.ms/profile`,
+          `${API_URL}/profile`,
           {
             headers: {
               Authorization: `Bearer ${user?.access_token}`,
@@ -143,8 +144,9 @@ export default function Settings() {
   const handleConnectAccount = async (platform: string) => {
     if (platform === "Steam") {
       try {
+        const API_URL = import.meta.env.VITE_API_URL;
         const response = await fetch(
-          `https://3wn67830-3000.use2.devtunnels.ms/profile/steam/auth`,
+          `${API_URL}/profile/steam/auth`,
           {
             headers: {
               Authorization: `Bearer ${user?.access_token}`,
@@ -190,8 +192,10 @@ export default function Settings() {
             "We're importing your Steam games. This process runs in the background and may take up to 10 minutes. You can continue using the app normally.",
         });
 
+        const API_URL = import.meta.env.VITE_API_URL;
+
         const response = await fetch(
-          "https://3wn67830-3000.use2.devtunnels.ms/games/steam",
+          `${API_URL}/games/steam`,
           {
             method: "POST",
             headers: {
@@ -228,8 +232,10 @@ export default function Settings() {
 
     if (platform === "Steam") {
       try {
+        const API_URL = import.meta.env.VITE_API_URL;
+
         const response = await fetch(
-          "https://3wn67830-3000.use2.devtunnels.ms/profile/steam/auth",
+          `${API_URL}/profile/steam/auth`,
           {
             method: "DELETE",
             headers: {

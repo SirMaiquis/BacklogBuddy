@@ -14,8 +14,10 @@ export default function SteamCallback() {
 
     const handleCallback = async () => {
       try {
+        const API_URL = import.meta.env.VITE_API_URL;
+
         const response = await fetch(
-          `https://3wn67830-3000.use2.devtunnels.ms/profile/steam/auth${location.search}`,
+          `${API_URL}/profile/steam/auth${location.search}`,
           {
             method: "POST",
             headers: {
