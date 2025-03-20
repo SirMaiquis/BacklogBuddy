@@ -1,5 +1,6 @@
 import { supabase } from "../../supabase/supabase";
 import { Game, GameNote, ExternalGameProvider } from "../types/game";
+import { GameResponse } from "./api-client/backlog-buddy-api/types/games/responses/games.response";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -104,7 +105,10 @@ export async function createGame(game: {
   return data;
 }
 
-export async function updateGame(id: string, updates: Partial<Game>) {
+export async function updateGame(
+  id: string,
+  updates: Partial<GameResponse>
+): Promise<GameResponse> {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const response = await fetch(`${API_URL}/games/${id}`, {
     method: "PUT",
@@ -120,7 +124,7 @@ export async function updateGame(id: string, updates: Partial<Game>) {
   }
 
   const data = await response.json();
-  return data as Game;
+  return data as GameResponse;
 }
 
 export async function deleteGame(id: string) {

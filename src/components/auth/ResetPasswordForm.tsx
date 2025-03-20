@@ -13,6 +13,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 import { KeyRound, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
 
 export default function ResetPasswordForm() {
   const [email, setEmail] = useState("");
@@ -25,6 +26,7 @@ export default function ResetPasswordForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const backlogBuddyApiClient = new BacklogBuddyApiClient();
 
   useEffect(() => {
     // Check if we have a token in the URL hash
@@ -49,18 +51,9 @@ export default function ResetPasswordForm() {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/reset-password",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        },
-      );
+      const response = await backlogBuddyApiClient.resetPassword({ email });
 
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error("Failed to request password reset");
       }
 
@@ -91,19 +84,12 @@ export default function ResetPasswordForm() {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/confirm-reset-password",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${resetToken}`,
-          },
-          body: JSON.stringify({ newPassword }),
-        },
+      const response = await backlogBuddyApiClient.confirmResetPassword(
+        { newPassword },
+        resetToken,
       );
 
-      if (!response.ok) {
+      if (!response?.success) {
         throw new Error("Failed to reset password");
       }
 

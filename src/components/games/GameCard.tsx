@@ -18,15 +18,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { updateGame } from "@/lib/api";
+import { GameResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/games.response";
 
 interface GameCardProps {
-  game: Game;
+  game: GameResponse;
   onClick?: () => void;
-  onUpdate?: (updatedGame: Game) => void;
+  onUpdate?: (updatedGame: GameResponse) => void;
 }
 
 export function GameCard({ game, onClick, onUpdate }: GameCardProps) {
-  const handleStatusChange = async (status: Game["status"]) => {
+  const handleStatusChange = async (status: GameResponse["status"]) => {
     if (!onUpdate) return;
     const updated = await updateGame(game.id, { status });
     onUpdate(updated);
@@ -143,14 +144,14 @@ export function GameCard({ game, onClick, onUpdate }: GameCardProps) {
           {game.title}
         </h3>
         <div className="flex flex-wrap gap-2 mb-3">
-          {game.platform && (
+          {true && (
             <Badge variant="outline" className="text-xs">
-              {game.platform}
+              Platform
             </Badge>
           )}
-          {game.genre && (
+          {true && (
             <Badge variant="secondary" className="text-xs">
-              {game.genre}
+              Genre
             </Badge>
           )}
         </div>

@@ -4,9 +4,9 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Game } from "@/types/game";
 import { Gamepad2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import { GameResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/games.response";
 interface GameGridProps {
-  games: Game[];
+  games: GameResponse[];
   isLoading?: boolean;
   emptyStateAction?: () => void;
 }
@@ -17,7 +17,7 @@ export function GameGrid({
   emptyStateAction,
 }: GameGridProps) {
   const navigate = useNavigate();
-  const [displayGames, setDisplayGames] = useState<Game[]>([]);
+  const [displayGames, setDisplayGames] = useState<GameResponse[]>([]);
 
   useEffect(() => {
     setDisplayGames(games);
@@ -27,7 +27,7 @@ export function GameGrid({
     navigate(`/games/${gameId}`);
   };
 
-  const handleGameUpdate = (updatedGame: Game) => {
+  const handleGameUpdate = (updatedGame: GameResponse) => {
     setDisplayGames((currentGames) =>
       currentGames.map((g) => (g.id === updatedGame.id ? updatedGame : g)),
     );

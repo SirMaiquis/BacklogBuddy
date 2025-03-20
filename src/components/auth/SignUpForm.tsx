@@ -13,6 +13,8 @@ import { useNavigate, Link } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 import { UserPlus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
+import { SignUpRequest } from "@/lib/api-client/backlog-buddy-api/types/auth/requests/sign-up.request";
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("");
@@ -22,6 +24,7 @@ export default function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const backlogBuddyApiClient = new BacklogBuddyApiClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,26 +32,18 @@ export default function SignUpForm() {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://3wn67830-3000.use2.devtunnels.ms/auth/signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            metadata: {
-              name,
-            },
-          }),
+      const request: SignUpRequest = {
+        email,
+        password,
+        metadata: {
+          name,
         },
-      );
+      };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error creating account");
+      const response = await backlogBuddyApiClient.signUp(request);
+
+      if (!response?.user?.id) {
+        throw new Error("Error creating account");
       }
 
       toast({

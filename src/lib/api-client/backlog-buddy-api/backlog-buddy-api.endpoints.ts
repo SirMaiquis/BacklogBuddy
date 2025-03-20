@@ -22,7 +22,7 @@ export class BacklogBuddyApiEndpoints {
 
     return {
       getAll: `${base}`,
-      getDetails: (id: string) => `${base}/${id}`,
+      getDetails: (id: string) => `${base}/details/${id}`,
       search: `${base}/search`,
       create: `${base}`,
       update: (id: string) => `${base}/${id}`,

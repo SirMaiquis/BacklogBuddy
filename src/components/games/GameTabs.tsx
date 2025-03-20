@@ -8,10 +8,11 @@ import { Game } from "@/types/game";
 import { fetchGames } from "@/lib/api";
 import { Plus, Layers, Archive, Gamepad, Trophy } from "lucide-react";
 import { Card } from "@/components/ui/card";
-
+import { GameResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/games.response";
+import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
 export function GameTabs() {
-  const [games, setGames] = useState<Game[]>([]);
-  const [filteredGames, setFilteredGames] = useState<Game[]>([]);
+  const [games, setGames] = useState<GameResponse[]>([]);
+  const [filteredGames, setFilteredGames] = useState<GameResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [filters, setFilters] = useState<GameFiltersType>({
@@ -21,10 +22,12 @@ export function GameTabs() {
     favorites: false,
   });
 
+  const backlogBuddyApiClient = new BacklogBuddyApiClient();
+
   const loadGames = async () => {
     setIsLoading(true);
     try {
-      const data = await fetchGames();
+      const data = await backlogBuddyApiClient.getGames();
       setGames(data);
     } catch (error) {
       console.error("Failed to load games:", error);
@@ -51,16 +54,6 @@ export function GameTabs() {
       result = result.filter((game) =>
         game.title.toLowerCase().includes(searchLower),
       );
-    }
-
-    // Apply platform filter
-    if (filters.platform) {
-      result = result.filter((game) => game.platform === filters.platform);
-    }
-
-    // Apply genre filter
-    if (filters.genre) {
-      result = result.filter((game) => game.genre === filters.genre);
     }
 
     // Apply favorites filter

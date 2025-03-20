@@ -37,7 +37,7 @@ import {
   deleteGameNote,
 } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
-import { Game, GameNote } from "@/types/game";
+import { GameNote } from "@/types/game";
 import {
   ArrowLeft,
   Clock,
@@ -49,35 +49,37 @@ import {
   Plus,
   Star,
   Tag,
-  Users,
   Zap,
   Timer,
   CheckCircle,
-  Award,
-  Heart,
   FileText,
   Gamepad,
 } from "lucide-react";
+import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
+import { GameDetailsResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/game-details.response";
 
 export function GameDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [game, setGame] = useState<Game | null>(null);
+  const [game, setGame] = useState<GameDetailsResponse | null>(null);
   const [notes, setNotes] = useState<GameNote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedGame, setEditedGame] = useState<Partial<Game>>({});
+  const [editedGame, setEditedGame] = useState<Partial<GameDetailsResponse>>({});
   const [newNote, setNewNote] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editedNoteContent, setEditedNoteContent] = useState("");
   const [activeTab, setActiveTab] = useState("details");
 
+  const backlogBuddyApiClient = new BacklogBuddyApiClient();
+
   const loadGame = async () => {
     if (!id) return;
     setIsLoading(true);
     try {
-      const gameData = await fetchGame(id);
+      const gameData = await backlogBuddyApiClient.getGameDetails({ id });
+
       setGame(gameData);
       setEditedGame({
         status: gameData.status,

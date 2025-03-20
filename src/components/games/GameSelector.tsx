@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Star } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
-
+import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
+import { GameSearchResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/game-search.response";
 interface GameSelectorProps {
   onSelect: (game: any) => void;
   onCancel: () => void;
@@ -15,8 +16,10 @@ interface GameSelectorProps {
 
 export function GameSelector({ onSelect, onCancel }: GameSelectorProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [games, setGames] = useState<any[]>([]);
+  const [games, setGames] = useState<GameSearchResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const backlogBuddyApiClient = new BacklogBuddyApiClient();
 
   useEffect(() => {
     loadGames();
@@ -25,7 +28,7 @@ export function GameSelector({ onSelect, onCancel }: GameSelectorProps) {
   const loadGames = async (search: string = "") => {
     setIsLoading(true);
     try {
-      const data = await fetchExternalGames(search);
+      const data = await backlogBuddyApiClient.searchGames({ name: search });
       setGames(data);
     } catch (error) {
       console.error("Failed to load games:", error);
@@ -79,7 +82,7 @@ export function GameSelector({ onSelect, onCancel }: GameSelectorProps) {
             ) : (
               games.map((game) => (
                 <Card
-                  key={game.id}
+                  key={game.igdb_id}
                   className="hover:bg-accent/50 cursor-pointer transition-colors"
                   onClick={() => onSelect(game)}
                 >
@@ -87,12 +90,12 @@ export function GameSelector({ onSelect, onCancel }: GameSelectorProps) {
                     <div className="w-16 h-20 overflow-hidden rounded-md flex-shrink-0">
                       <img
                         src={game.cover_art}
-                        alt={game.title}
+                        alt={game.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex-grow">
-                      <h3 className="font-medium">{game.title}</h3>
+                      <h3 className="font-medium">{game.name}</h3>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                         <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                         <span>{game.rating}</span>
@@ -100,7 +103,7 @@ export function GameSelector({ onSelect, onCancel }: GameSelectorProps) {
                           orientation="vertical"
                           className="h-3 mx-1"
                         />
-                        <span>{game.platform}</span>
+                        <span>{game.platforms[0]}</span>
                       </div>
                       <div className="flex flex-wrap gap-1 mt-2">
                         {game.genres?.slice(0, 3).map((genre: string) => (
