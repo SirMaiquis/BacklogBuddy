@@ -28,6 +28,10 @@ export class BacklogBuddyApiEndpoints {
       update: (id: string) => `${base}/${id}`,
       delete: (id: string) => `${base}/${id}`,
       import: (platform: string) => `${base}/import/${platform}`,
+      notes: (gameId: string) => `${base}/${gameId}/notes`,
+      createNote: (gameId: string) => `${base}/${gameId}/notes`,
+      updateNote: (gameId: string, noteId: string) => `${base}/${gameId}/notes/${noteId}`,
+      deleteNote: (gameId: string, noteId: string) => `${base}/${gameId}/notes/${noteId}`,
     };
   };
 

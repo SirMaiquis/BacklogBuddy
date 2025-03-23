@@ -3,9 +3,13 @@ import { BacklogBuddyApiClient } from "../backlog-buddy-api.client";
 import { GamesEndpoints } from "../backlog-buddy-api.endpoints";
 import { GameCreateRequest } from "./types/requests/game-create.request";
 import { GameDetailsRequest } from "./types/requests/game-details.request";
+import { GameNoteCreateRequest } from "./types/requests/game-note-create.request";
+import { GameNoteDeleteRequest } from "./types/requests/game-note-delete.request";
+import { GameNoteUpdateRequest } from "./types/requests/game-notes-update.request";
 import { GameSearchRequest } from "./types/requests/game-search.request";
 import { GameCreateResponse } from "./types/responses/game-create.response";
 import { GameDetailsResponse } from "./types/responses/game-details.response";
+import { GameNoteResponse } from "./types/responses/game-notes.response";
 import { GameSearchResponse } from "./types/responses/game-search.response";
 import { GameResponse } from "./types/responses/games.response";
 import axios from "axios";
@@ -96,4 +100,48 @@ export class BacklogBuddyGamesApiClient extends BacklogBuddyApiClient {
 
       return await this.makeRequest<GameCreateResponse>(request, "createGame");
     }
-}
+
+    async createGameNote(options: GameNoteCreateRequest): Promise<GameNoteResponse> {
+      const endpoint = this.gamesEndpoints.createNote(options.game_id);
+      const headers = {
+        Authorization: this.getAuthorizationToken(),
+      };
+
+      const request = () => this.httpService.axiosRef.post(endpoint, { content: options.content }, { headers });
+
+      return await this.makeRequest<GameNoteResponse>(request, "createGameNote");
+    }
+
+    async getGameNotes(gameId: string): Promise<GameNoteResponse[]> {
+      const endpoint = this.gamesEndpoints.notes(gameId);
+      const headers = {
+        Authorization: this.getAuthorizationToken(),
+      };
+    
+      const request = () => this.httpService.axiosRef.get(endpoint, { headers });
+
+      return await this.makeRequest<GameNoteResponse[]>(request, "getGameNotes");
+    }
+
+    async updateGameNote(options: GameNoteUpdateRequest): Promise<GameNoteResponse> {
+      const endpoint = this.gamesEndpoints.updateNote(options.game_id, options.note_id);
+      const headers = {
+        Authorization: this.getAuthorizationToken(),
+      };
+
+      const request = () => this.httpService.axiosRef.put(endpoint, { content: options.content }, { headers });
+
+      return await this.makeRequest<GameNoteResponse>(request, "updateGameNote");
+    }
+
+    async deleteGameNote(options: GameNoteDeleteRequest): Promise<SuccessResponse> {
+      const endpoint = this.gamesEndpoints.deleteNote(options.game_id, options.note_id);
+      const headers = {
+        Authorization: this.getAuthorizationToken(),
+      };
+
+      const request = () => this.httpService.axiosRef.delete(endpoint, { headers });
+
+      return await this.makeRequest<SuccessResponse>(request, "deleteGameNote");
+    }
+  }

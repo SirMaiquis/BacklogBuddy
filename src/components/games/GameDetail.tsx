@@ -91,7 +91,7 @@ export function GameDetail() {
         favorite: gameData.favorite,
       });
 
-      const notesData = await fetchGameNotes(id);
+      const notesData = await backlogBuddyApiClient.getGameNotes(id);
       setNotes(notesData);
     } catch (error) {
       console.error("Failed to load game:", error);
@@ -152,7 +152,7 @@ export function GameDetail() {
     if (!id || !newNote.trim()) return;
 
     try {
-      const addedNote = await createGameNote({
+      const addedNote = await backlogBuddyApiClient.createGameNote({
         game_id: id,
         content: newNote,
       });
@@ -180,10 +180,11 @@ export function GameDetail() {
     if (!editingNoteId) return;
 
     try {
-      const updatedNote = await updateGameNote(
-        editingNoteId,
-        editedNoteContent,
-      );
+      const updatedNote = await backlogBuddyApiClient.updateGameNote({
+        game_id: id,
+        note_id: editingNoteId,
+        content: editedNoteContent,
+      });
       setNotes(
         notes.map((note) => (note.id === editingNoteId ? updatedNote : note)),
       );
@@ -204,7 +205,10 @@ export function GameDetail() {
 
   const handleDeleteNote = async (noteId: string) => {
     try {
-      await deleteGameNote(noteId);
+      await backlogBuddyApiClient.deleteGameNote({
+        game_id: id,
+        note_id: noteId,
+      });
       setNotes(notes.filter((note) => note.id !== noteId));
       toast({
         title: "Note deleted",
