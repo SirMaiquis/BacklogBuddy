@@ -13,7 +13,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 import { KeyRound, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
+import { BacklogBuddyAuthApiClient } from "@/lib/api-client/backlog-buddy-api/auth/backlog-buddy-api.auth.client";
 
 export default function ResetPasswordForm() {
   const [email, setEmail] = useState("");
@@ -26,7 +26,7 @@ export default function ResetPasswordForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const backlogBuddyApiClient = new BacklogBuddyApiClient();
+  const backlogBuddyAuthApiClient = new BacklogBuddyAuthApiClient();
 
   useEffect(() => {
     // Check if we have a token in the URL hash
@@ -51,7 +51,7 @@ export default function ResetPasswordForm() {
     setError("");
 
     try {
-      const response = await backlogBuddyApiClient.resetPassword({ email });
+      const response = await backlogBuddyAuthApiClient.resetPassword({ email });
 
       if (!response.success) {
         throw new Error("Failed to request password reset");
@@ -84,7 +84,7 @@ export default function ResetPasswordForm() {
     setError("");
 
     try {
-      const response = await backlogBuddyApiClient.confirmResetPassword(
+      const response = await backlogBuddyAuthApiClient.confirmResetPassword(
         { newPassword },
         resetToken,
       );

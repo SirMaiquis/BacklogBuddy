@@ -55,8 +55,8 @@ import {
   FileText,
   Gamepad,
 } from "lucide-react";
-import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
-import { GameDetailsResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/game-details.response";
+import { GameDetailsResponse } from "@/lib/api-client/backlog-buddy-api/games/types/responses/game-details.response";
+import { BacklogBuddyGamesApiClient } from "@/lib/api-client/backlog-buddy-api/games/backlog-buddy-api.games.client";
 
 export function GameDetail() {
   const { id } = useParams();
@@ -72,7 +72,7 @@ export function GameDetail() {
   const [editedNoteContent, setEditedNoteContent] = useState("");
   const [activeTab, setActiveTab] = useState("details");
 
-  const backlogBuddyApiClient = new BacklogBuddyApiClient();
+  const backlogBuddyApiClient = new BacklogBuddyGamesApiClient();
 
   const loadGame = async () => {
     if (!id) return;

@@ -1,6 +1,6 @@
 import { supabase } from "../../supabase/supabase";
 import { Game, GameNote, ExternalGameProvider } from "../types/game";
-import { GameResponse } from "./api-client/backlog-buddy-api/types/games/responses/games.response";
+import { GameResponse } from "./api-client/backlog-buddy-api/games/types/responses/games.response";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

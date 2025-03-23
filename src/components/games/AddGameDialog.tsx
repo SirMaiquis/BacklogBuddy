@@ -23,6 +23,7 @@ import { createGame } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 import { GameSelector } from "./GameSelector";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BacklogBuddyGamesApiClient } from "@/lib/api-client/backlog-buddy-api/games/backlog-buddy-api.games.client";
 
 interface AddGameDialogProps {
   onGameAdded: () => void;
@@ -42,8 +43,8 @@ export function AddGameDialog({ onGameAdded, trigger }: AddGameDialogProps) {
     genre: "",
     genres: [] as string[],
     status: "backlog",
-    estimated_completion_time: "",
-    external_game_id: "",
+    playtime: 0,
+    igdb_id: "",
     rating: 0,
     time_to_beat: {
       hastily: 0,
@@ -52,6 +53,7 @@ export function AddGameDialog({ onGameAdded, trigger }: AddGameDialogProps) {
     },
     game_modes: [] as string[],
   });
+  const backlogBuddyGamesApiClient = new BacklogBuddyGamesApiClient();
 
   const handleChange = (
     field: string,
@@ -69,7 +71,7 @@ export function AddGameDialog({ onGameAdded, trigger }: AddGameDialogProps) {
       platform: game.platform,
       genre: game.genre,
       genres: game.genres || [],
-      external_game_id: game.id,
+      igdb_id: game.igdb_id,
       rating: game.rating || 0,
       time_to_beat: game.time_to_beat || {
         hastily: 0,
@@ -86,18 +88,14 @@ export function AddGameDialog({ onGameAdded, trigger }: AddGameDialogProps) {
     setIsLoading(true);
 
     try {
-      await createGame({
-        status: formData.status,
-        playtime: 0,
-        completion_percentage: 0,
-        achievements_earned: 0,
-        achievements_total: 0,
-        estimated_completion_time: formData.estimated_completion_time
-          ? parseInt(formData.estimated_completion_time as string)
-          : undefined,
-        favorite: false,
-        igdb_id: parseInt(formData.external_game_id),
-      });
+      console.log(formData);
+      const response = await backlogBuddyGamesApiClient.createGame(
+        {
+          igdb_id: parseInt(formData.igdb_id),
+          status: formData.status,
+          playtime: formData.playtime,
+        }
+      );
 
       toast({
         title: "Game added",
@@ -111,8 +109,8 @@ export function AddGameDialog({ onGameAdded, trigger }: AddGameDialogProps) {
         genre: "",
         genres: [],
         status: "backlog",
-        estimated_completion_time: "",
-        external_game_id: "",
+        playtime: 0,
+        igdb_id: "",
         rating: 0,
         time_to_beat: {
           hastily: 0,
@@ -204,19 +202,19 @@ export function AddGameDialog({ onGameAdded, trigger }: AddGameDialogProps) {
                   </Select>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="estimated_time" className="text-right">
-                    Est. Hours
+                  <Label htmlFor="playtime" className="text-right">
+                    Hours Played
                   </Label>
                   <Input
-                    id="estimated_time"
+                    id="playtime"
                     type="number"
                     min="0"
-                    value={formData.estimated_completion_time}
+                    value={formData.playtime}
                     onChange={(e) =>
-                      handleChange("estimated_completion_time", e.target.value)
+                      handleChange("playtime", e.target.value)
                     }
                     className="col-span-3"
-                    placeholder="Estimated completion time in hours"
+                    placeholder="Hours played"
                   />
                 </div>
               </div>

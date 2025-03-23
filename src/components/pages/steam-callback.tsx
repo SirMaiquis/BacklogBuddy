@@ -2,37 +2,30 @@ import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/App";
 import { useToast } from "@/components/ui/use-toast";
+import { BacklogBuddyProfileApiClient } from "@/lib/api-client/backlog-buddy-api/profile/backlog-buddy-api.profile.client";
 
 export default function SteamCallback() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const backlogBuddyProfileApiClient = new BacklogBuddyProfileApiClient();
 
   useEffect(() => {
-    let timeoutId: number;
+    let timeoutId: NodeJS.Timeout;
 
     const handleCallback = async () => {
       try {
-        const response = await fetch(
-          `https://3wn67830-3000.use2.devtunnels.ms/profile/steam/auth${location.search}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${user?.access_token}`,
-            },
-          },
-        );
-
-        if (!response.ok)
+        const response = await backlogBuddyProfileApiClient.confirmLinking("steam", location.search);
+        if (!response.success) {
           throw new Error("Failed to complete Steam authentication");
-
-        toast({
-          title: "Success",
-          description: "Steam account connected successfully!",
-        });
+        }
 
         timeoutId = setTimeout(() => {
+          toast({
+            title: "Success",
+            description: "Steam account connected successfully!",
+          });
           navigate("/settings");
         }, 5000);
       } catch (error) {
@@ -51,7 +44,7 @@ export default function SteamCallback() {
     handleCallback();
 
     return () => clearTimeout(timeoutId);
-  }, [location.search, user, navigate, toast]);
+  }, [location.search]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">

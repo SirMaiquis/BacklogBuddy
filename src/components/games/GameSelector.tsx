@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Star } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
-import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
-import { GameSearchResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/game-search.response";
+import { GameSearchResponse } from "@/lib/api-client/backlog-buddy-api/games/types/responses/game-search.response";
+import { BacklogBuddyGamesApiClient } from "@/lib/api-client/backlog-buddy-api/games/backlog-buddy-api.games.client";
 interface GameSelectorProps {
   onSelect: (game: any) => void;
   onCancel: () => void;
@@ -19,7 +19,7 @@ export function GameSelector({ onSelect, onCancel }: GameSelectorProps) {
   const [games, setGames] = useState<GameSearchResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const backlogBuddyApiClient = new BacklogBuddyApiClient();
+  const backlogBuddyApiClient = new BacklogBuddyGamesApiClient();
 
   useEffect(() => {
     loadGames();

@@ -4,12 +4,11 @@ import { GameGrid } from "./GameGrid";
 import { GameFilters, GameFilters as GameFiltersType } from "./GameFilters";
 import { AddGameDialog } from "./AddGameDialog";
 import { Button } from "@/components/ui/button";
-import { Game } from "@/types/game";
-import { fetchGames } from "@/lib/api";
 import { Plus, Layers, Archive, Gamepad, Trophy } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { GameResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/games.response";
-import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
+import { GameResponse } from "@/lib/api-client/backlog-buddy-api/games/types/responses/games.response";
+import { BacklogBuddyGamesApiClient } from "@/lib/api-client/backlog-buddy-api/games/backlog-buddy-api.games.client";
+
 export function GameTabs() {
   const [games, setGames] = useState<GameResponse[]>([]);
   const [filteredGames, setFilteredGames] = useState<GameResponse[]>([]);
@@ -22,12 +21,12 @@ export function GameTabs() {
     favorites: false,
   });
 
-  const backlogBuddyApiClient = new BacklogBuddyApiClient();
+  const backlogBuddyGamesApiClient = new BacklogBuddyGamesApiClient();
 
   const loadGames = async () => {
     setIsLoading(true);
     try {
-      const data = await backlogBuddyApiClient.getGames();
+      const data = await backlogBuddyGamesApiClient.getGames();
       setGames(data);
     } catch (error) {
       console.error("Failed to load games:", error);

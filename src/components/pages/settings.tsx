@@ -27,6 +27,8 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/layout/Header";
+import { BacklogBuddyProfileApiClient } from "@/lib/api-client/backlog-buddy-api/profile/backlog-buddy-api.profile.client";
+import { BacklogBuddyGamesApiClient } from "@/lib/api-client/backlog-buddy-api/games/backlog-buddy-api.games.client";
 
 interface GamingAccount {
   platform: string;
@@ -79,31 +81,21 @@ export default function Settings() {
       disabled: true,
     },
   ]);
+  const backlogBuddyApiClient = new BacklogBuddyProfileApiClient();
+  const backlogBuddyGamesApiClient = new BacklogBuddyGamesApiClient();
 
-  // Load profile and connected accounts on mount
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const response = await fetch(
-          `https://3wn67830-3000.use2.devtunnels.ms/profile`,
-          {
-            headers: {
-              Authorization: `Bearer ${user?.access_token}`,
-            },
-          },
-        );
-
-        if (!response.ok) throw new Error("Failed to load profile");
-
-        const data = await response.json();
+        const response = await backlogBuddyApiClient.getProfile();
 
         setAccounts(
           accounts.map((account) => {
-            if (account.platform === "Steam" && data.steam_id) {
+            if (account.platform === "Steam" && response.steam_id) {
               return {
                 ...account,
                 isConnected: true,
-                username: data.steam_id,
+                username: response.steam_id,
               };
             }
             return account;
@@ -143,19 +135,12 @@ export default function Settings() {
   const handleConnectAccount = async (platform: string) => {
     if (platform === "Steam") {
       try {
-        const response = await fetch(
-          `https://3wn67830-3000.use2.devtunnels.ms/profile/steam/auth`,
-          {
-            headers: {
-              Authorization: `Bearer ${user?.access_token}`,
-            },
-          },
-        );
+        const response = await backlogBuddyApiClient.initLink("steam");
+        if (!response.url) {
+          throw new Error("Failed to initiate Steam auth");
+        }
 
-        if (!response.ok) throw new Error("Failed to initiate Steam auth");
-
-        const { url } = await response.json();
-        window.location.href = url;
+        window.location.href = response.url;
       } catch (error) {
         console.error("Steam auth error:", error);
         toast({
@@ -190,19 +175,7 @@ export default function Settings() {
             "We're importing your Steam games. This process runs in the background and may take up to 10 minutes. You can continue using the app normally.",
         });
 
-        const response = await fetch(
-          "https://3wn67830-3000.use2.devtunnels.ms/games/steam",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${user?.access_token}`,
-            },
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to start game import");
-        }
+        await backlogBuddyGamesApiClient.importGames("steam");
       } catch (error) {
         console.error("Steam import error:", error);
         toast({
@@ -228,17 +201,12 @@ export default function Settings() {
 
     if (platform === "Steam") {
       try {
-        const response = await fetch(
-          "https://3wn67830-3000.use2.devtunnels.ms/profile/steam/auth",
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${user?.access_token}`,
-            },
-          },
-        );
+        const response = await backlogBuddyApiClient.unlink("steam");
+        if (!response.success) {
+          throw new Error("Failed to disconnect Steam account");
+        }
 
-        if (!response.ok) throw new Error("Failed to disconnect Steam account");
+        if (!response.success) throw new Error("Failed to disconnect Steam account");
 
         setAccounts(
           accounts.map((account) =>

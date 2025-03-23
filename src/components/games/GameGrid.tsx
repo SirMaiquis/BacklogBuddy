@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { GameCard } from "./GameCard";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Game } from "@/types/game";
 import { Gamepad2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { GameResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/games.response";
+import { GameResponse } from "@/lib/api-client/backlog-buddy-api/games/types/responses/games.response";
+
+
 interface GameGridProps {
   games: GameResponse[];
   isLoading?: boolean;

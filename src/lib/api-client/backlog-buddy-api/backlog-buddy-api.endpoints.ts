@@ -27,7 +27,7 @@ export class BacklogBuddyApiEndpoints {
       create: `${base}`,
       update: (id: string) => `${base}/${id}`,
       delete: (id: string) => `${base}/${id}`,
-      importFromSteam: `${base}/import/steam`,
+      import: (platform: string) => `${base}/import/${platform}`,
     };
   };
 
@@ -44,9 +44,14 @@ export class BacklogBuddyApiEndpoints {
 
     return {
       getProfileData: `${base}`,
-      startLinking: `${base}/link`,
-      confirmLinking: `${base}/link`,
-      unlink: `${base}/link`,
+      initLink: (provider: string) => `${base}/link/${provider}`,
+      confirmLink: (provider: string, metadata: string) => `${base}/link/${provider}${metadata}`,
+      unlink: (provider: string) => `${base}/link/${provider}`,
     };
   };
 }
+
+export type AuthEndpoints = ReturnType<BacklogBuddyApiEndpoints['auth']>;
+export type GamesEndpoints = ReturnType<BacklogBuddyApiEndpoints['games']>;
+export type LandingEndpoints = ReturnType<BacklogBuddyApiEndpoints['landing']>;
+export type ProfileEndpoints = ReturnType<BacklogBuddyApiEndpoints['profile']>;

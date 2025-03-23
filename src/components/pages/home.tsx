@@ -24,6 +24,7 @@ import { useAuth } from "@/App";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { BacklogBuddyLandingApiClient } from "@/lib/api-client/backlog-buddy-api/landing/backlog-buddy-api.landing.client";
 
 // Floating game card component
 const FloatingGameCard = ({
@@ -85,6 +86,7 @@ export default function LandingPage() {
     "https://steamcdn-a.akamaihd.net/steam/apps/413150/library_600x900_2x.jpg",
     "https://steamcdn-a.akamaihd.net/steam/apps/526870/library_600x900_2x.jpg",
   ];
+  const landingApiClient = new BacklogBuddyLandingApiClient();
 
   useEffect(() => {
     const fetchGameCovers = async () => {
@@ -93,13 +95,10 @@ export default function LandingPage() {
         if (user?.access_token) {
           headers.Authorization = `Bearer ${user.access_token}`;
         }
-        const response = await fetch(
-          "https://3wn67830-3000.use2.devtunnels.ms/landing",
-          { headers },
-        );
-        if (!response.ok) throw new Error("Failed to fetch game covers");
-        const data = await response.json();
-        setGameCovers(data.gamesCovers);
+        const response = await landingApiClient.getLandingData();
+        if (!response.gamesCovers) throw new Error("Failed to fetch game covers");
+        
+        setGameCovers(response.gamesCovers);
       } catch (error) {
         console.error("Error fetching game covers:", error);
         setGameCovers(defaultCovers);

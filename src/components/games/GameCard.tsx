@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { updateGame } from "@/lib/api";
-import { GameResponse } from "@/lib/api-client/backlog-buddy-api/types/games/responses/games.response";
+import { GameResponse } from "@/lib/api-client/backlog-buddy-api/games/types/responses/games.response";
 
 interface GameCardProps {
   game: GameResponse;

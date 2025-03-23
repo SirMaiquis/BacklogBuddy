@@ -13,8 +13,7 @@ import { useNavigate, Link } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 import { LogIn, KeyRound } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
-
+import { BacklogBuddyAuthApiClient } from "@/lib/api-client/backlog-buddy-api/auth/backlog-buddy-api.auth.client";
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +21,7 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const backlogBuddyAuthApiClient = new BacklogBuddyAuthApiClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +29,7 @@ export default function LoginForm() {
     setError("");
 
     try {
-      const backlogBuddyApiClient = new BacklogBuddyApiClient();
-      const response = await backlogBuddyApiClient.signIn({
+      const response = await backlogBuddyAuthApiClient.signIn({
         email,
         password,
       });

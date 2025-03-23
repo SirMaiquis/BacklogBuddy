@@ -18,8 +18,7 @@ import GameDetailPage from "./components/pages/game-detail-page";
 import Settings from "./components/pages/settings";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import { BacklogBuddyApiClient } from "./lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
-
+import { BacklogBuddyAuthApiClient } from "./lib/api-client/backlog-buddy-api/auth/backlog-buddy-api.auth.client";
 type AuthContextType = {
   user: any | null;
   loading: boolean;
@@ -31,6 +30,8 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signOut: async () => {},
 });
+
+const backlogBuddyAuthApiClient = new BacklogBuddyAuthApiClient();
 
 export const useAuth = () => {
   return useContext(AuthContext);
@@ -55,8 +56,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
-      const backlogBuddyApiClient = new BacklogBuddyApiClient();
-      const response = await backlogBuddyApiClient.signOut({
+      const response = await backlogBuddyAuthApiClient.signOut({
         authorizationToken: user.session.access_token,
       });
 

@@ -13,8 +13,8 @@ import { useNavigate, Link } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 import { UserPlus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { BacklogBuddyApiClient } from "@/lib/api-client/backlog-buddy-api/backlog-buddy-api.client";
-import { SignUpRequest } from "@/lib/api-client/backlog-buddy-api/types/auth/requests/sign-up.request";
+import { BacklogBuddyAuthApiClient } from "@/lib/api-client/backlog-buddy-api/auth/backlog-buddy-api.auth.client";
+import { SignUpRequest } from "@/lib/api-client/backlog-buddy-api/auth/types/requests/sign-up.request";
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("");
@@ -24,7 +24,7 @@ export default function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const backlogBuddyApiClient = new BacklogBuddyApiClient();
+  const backlogBuddyAuthApiClient = new BacklogBuddyAuthApiClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +40,7 @@ export default function SignUpForm() {
         },
       };
 
-      const response = await backlogBuddyApiClient.signUp(request);
+      const response = await backlogBuddyAuthApiClient.signUp(request);
 
       if (!response?.user?.id) {
         throw new Error("Error creating account");
