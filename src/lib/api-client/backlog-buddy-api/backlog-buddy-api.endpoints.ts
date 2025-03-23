@@ -14,6 +14,7 @@ export class BacklogBuddyApiEndpoints {
       signOut: `${base}/signout`,
       resetPassword: `${base}/reset-password`,
       confirmResetPassword: `${base}/confirm-reset-password`,
+      refreshSession: `${base}/session`,
     };
   };
 
