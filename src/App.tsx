@@ -19,6 +19,7 @@ import Settings from "./components/pages/settings";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { BacklogBuddyAuthApiClient } from "./lib/api-client/backlog-buddy-api/auth/backlog-buddy-api.auth.client";
+
 type AuthContextType = {
   user: any | null;
   loading: boolean;
@@ -33,13 +34,14 @@ const AuthContext = createContext<AuthContextType>({
 
 const backlogBuddyAuthApiClient = new BacklogBuddyAuthApiClient();
 
-export const useAuth = () => {
+function useAuth() {
   return useContext(AuthContext);
-};
+}
 
-const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [lastActivity, setLastActivity] = useState(Date.now());
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -54,7 +56,48 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }, []);
 
-  const signOut = async () => {
+  useEffect(() => {
+    if (!user) return;
+
+    const handleActivity = () => {
+      const now = Date.now();
+      if (now - lastActivity >= 10 * 60 * 1000) {
+        backlogBuddyAuthApiClient
+          .refreshSession()
+          .then((response) => {
+            if (response?.session) {
+              const userData = {
+                ...response.user,
+                access_token: response.session.access_token,
+                refresh_token: response.session.refresh_token,
+              };
+              localStorage.setItem("user", JSON.stringify(userData));
+              setUser(userData);
+            }
+          })
+          .catch((error) => {
+            console.error("Session refresh error:", error);
+            if (error.message?.includes("401")) {
+              localStorage.removeItem("user");
+              setUser(null);
+            }
+          });
+      }
+      setLastActivity(now);
+    };
+
+    window.addEventListener("mousemove", handleActivity);
+    window.addEventListener("keydown", handleActivity);
+    window.addEventListener("click", handleActivity);
+
+    return () => {
+      window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("keydown", handleActivity);
+      window.removeEventListener("click", handleActivity);
+    };
+  }, [user, lastActivity]);
+
+  async function signOut() {
     try {
       const response = await backlogBuddyAuthApiClient.signOut({
         authorizationToken: user.session.access_token,
@@ -71,16 +114,16 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.removeItem("user");
       setUser(null);
     }
-  };
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -92,9 +135,12 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   return <>{children}</>;
-};
+}
 
-const AppRoutes = () => {
+function AppRoutes() {
+  const tempoRoutes =
+    import.meta.env.VITE_TEMPO === "true" ? useRoutes(routes) : null;
+
   return (
     <>
       <Routes>
@@ -129,12 +175,12 @@ const AppRoutes = () => {
         <Route path="/success" element={<Success />} />
         <Route path="/auth/steam" element={<SteamCallback />} />
       </Routes>
-      {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
+      {tempoRoutes}
     </>
   );
-};
+}
 
-const App = () => {
+function App() {
   return (
     <ThemeProvider defaultTheme="dark">
       <AuthProvider>
@@ -145,6 +191,7 @@ const App = () => {
       </AuthProvider>
     </ThemeProvider>
   );
-};
+}
 
+export { useAuth };
 export default App;

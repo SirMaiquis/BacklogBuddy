@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Gamepad2, Settings, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/App";
 import {
   DropdownMenu,
@@ -39,10 +40,20 @@ export default function TopNavigation() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`}
-                    alt={user.email || ""}
-                  />
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key="avatar"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <AvatarImage
+                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`}
+                        alt={user.email || ""}
+                      />
+                    </motion.div>
+                  </AnimatePresence>
                   <AvatarFallback>
                     {user.email?.[0].toUpperCase()}
                   </AvatarFallback>

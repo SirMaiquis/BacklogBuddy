@@ -43,17 +43,23 @@ const FloatingGameCard = ({
   return (
     <motion.div
       className="absolute rounded-lg overflow-hidden shadow-lg border border-primary/20 w-32 h-44 z-0"
-      style={{ left: `${x}%`, top: `${y}%`, rotate: `${rotation}deg` }}
-      initial={{ opacity: 0, scale: 0.8 }}
+      style={{ left: `${x}%`, top: `${y}%` }}
+      initial={{
+        opacity: 0,
+        scale: 0.8,
+        rotate: rotation,
+        x: `${x}%`,
+        y: `${y}%`,
+      }}
       animate={{
         opacity: [0.3, 0.6, 0.3],
-        y: ["-5%", "5%", "-5%"],
-        x: ["-2%", "2%", "-2%"],
+        y: [`${y}%`, `${y + 5}%`, `${y}%`],
+        x: [`${x}%`, `${x + 2}%`, `${x}%`],
         rotate: [rotation - 5, rotation + 5, rotation - 5],
       }}
       transition={{
         repeat: Infinity,
-        duration: 15 + Math.random() * 10,
+        duration: 15,
         delay: delay,
         ease: "easeInOut",
       }}
@@ -71,7 +77,6 @@ const FloatingGameCard = ({
 export default function LandingPage() {
   const { user, signOut } = useAuth();
   const [floatingCards, setFloatingCards] = useState<React.ReactNode[]>([]);
-
   const [gameCovers, setGameCovers] = useState<string[]>([]);
 
   const defaultCovers = [
@@ -88,6 +93,25 @@ export default function LandingPage() {
   ];
   const landingApiClient = new BacklogBuddyLandingApiClient();
 
+  const [positions] = useState(() => {
+    const pos = [];
+    for (let i = 0; i < 16; i++) {
+      const section = Math.floor(i / 3);
+      const xMin = (section % 2) * 50;
+      const xMax = xMin + 50;
+      const yMin = Math.floor(section / 2) * 50;
+      const yMax = yMin + 50;
+
+      pos.push({
+        x: xMin + Math.random() * (xMax - xMin),
+        y: yMin + Math.random() * (yMax - yMin),
+        rotation: (Math.random() - 0.5) * 20,
+        delay: Math.random() * 5,
+      });
+    }
+    return pos;
+  });
+
   useEffect(() => {
     const fetchGameCovers = async () => {
       try {
@@ -96,8 +120,9 @@ export default function LandingPage() {
           headers.Authorization = `Bearer ${user.access_token}`;
         }
         const response = await landingApiClient.getLandingData();
-        if (!response.gamesCovers) throw new Error("Failed to fetch game covers");
-        
+        if (!response.gamesCovers)
+          throw new Error("Failed to fetch game covers");
+
         setGameCovers(response.gamesCovers);
       } catch (error) {
         console.error("Error fetching game covers:", error);
@@ -108,39 +133,25 @@ export default function LandingPage() {
     fetchGameCovers();
   }, []);
 
-  // Generate floating cards on component mount
   useEffect(() => {
     if (gameCovers.length > 0) {
       const cards = [];
-      // Create 16 floating cards with random positions
       for (let i = 0; i < 16; i++) {
-        // Ensure cards are distributed across the viewport
-        const section = Math.floor(i / 3); // Divide viewport into 4 sections
-        const xMin = (section % 2) * 50; // Left or right half
-        const xMax = xMin + 50;
-        const yMin = Math.floor(section / 2) * 50; // Top or bottom half
-        const yMax = yMin + 50;
-
-        const x = xMin + Math.random() * (xMax - xMin); // Position within section
-        const y = yMin + Math.random() * (yMax - yMin);
-        const delay = Math.random() * 5; // Random delay (0-5s)
-        const image = gameCovers[i % gameCovers.length]; // Cycle through available images
-        const rotation = (Math.random() - 0.5) * 20; // Random rotation (-10 to 10 degrees)
-
+        const image = gameCovers[i % gameCovers.length];
         cards.push(
           <FloatingGameCard
-            key={i}
-            x={x}
-            y={y}
-            delay={delay}
+            key={`${i}-${image}`}
+            x={positions[i].x}
+            y={positions[i].y}
+            delay={positions[i].delay}
             image={image}
-            rotation={rotation}
+            rotation={positions[i].rotation}
           />,
         );
       }
       setFloatingCards(cards);
     }
-  }, [gameCovers]);
+  }, [gameCovers, positions]);
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -249,7 +260,7 @@ export default function LandingPage() {
 
               <motion.h1
                 variants={fadeIn}
-                className="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 bg-gradient-to-br from-foreground via-primary to-purple-600 bg-clip-text text-transparent tracking-tight"
+                className="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 bg-gradient-to-br from-foreground via-primary to-purple-600 bg-clip-text text-transparent tracking-tight leading-relaxed py-4"
               >
                 Master Your Gaming Backlog
               </motion.h1>
