@@ -44,9 +44,7 @@ export default function Settings() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [fullName, setFullName] = useState(
-    user?.user_metadata?.full_name || "",
-  );
+  const [fullName, setFullName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [accounts, setAccounts] = useState<GamingAccount[]>([
     {
@@ -89,6 +87,8 @@ export default function Settings() {
       try {
         const response = await backlogBuddyApiClient.getProfile();
 
+        setFullName(response.name);
+
         setAccounts(
           accounts.map((account) => {
             if (account.platform === "Steam" && response.steam_id) {
@@ -116,7 +116,10 @@ export default function Settings() {
     setIsLoading(true);
 
     try {
-      await updateUserProfile({ full_name: fullName });
+      await backlogBuddyApiClient.updateProfile({
+        name: fullName,
+        preferred_theme: "dark", // We'll keep this static for now as theme is handled separately
+      });
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
@@ -206,7 +209,8 @@ export default function Settings() {
           throw new Error("Failed to disconnect Steam account");
         }
 
-        if (!response.success) throw new Error("Failed to disconnect Steam account");
+        if (!response.success)
+          throw new Error("Failed to disconnect Steam account");
 
         setAccounts(
           accounts.map((account) =>
@@ -318,7 +322,7 @@ export default function Settings() {
                         <Label htmlFor="fullName">Full Name</Label>
                         <Input
                           id="fullName"
-                          value={user?.name}
+                          value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           placeholder="Enter your full name"
                         />
