@@ -49,6 +49,7 @@ export class BacklogBuddyApiEndpoints {
 
     return {
       getProfileData: `${base}`,
+      updateProfile: `${base}`,
       initLink: (provider: string) => `${base}/link/${provider}`,
       confirmLink: (provider: string, metadata: string) => `${base}/link/${provider}${metadata}`,
       unlink: (provider: string) => `${base}/link/${provider}`,

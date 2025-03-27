@@ -318,7 +318,7 @@ export default function Settings() {
                         <Label htmlFor="fullName">Full Name</Label>
                         <Input
                           id="fullName"
-                          value={fullName}
+                          value={user?.name}
                           onChange={(e) => setFullName(e.target.value)}
                           placeholder="Enter your full name"
                         />

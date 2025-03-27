@@ -3,6 +3,7 @@ import { ProfileEndpoints } from "../backlog-buddy-api.endpoints";
 import { GetProfileDataResponse } from "./types/responses/get-profile-data.response";
 import { InitLinkResponse } from "./types/responses/init-link.response";
 import { SuccessResponse } from "../auth/types/responses/success-response";   
+import { UpdateProfileDataRequest } from "./types/requests/update-profile-data.request";
 
 export class BacklogBuddyProfileApiClient extends BacklogBuddyApiClient {
     private readonly profileEndpoints: ProfileEndpoints;
@@ -20,6 +21,15 @@ export class BacklogBuddyProfileApiClient extends BacklogBuddyApiClient {
 				const request = () => this.httpService.axiosRef.get(this.profileEndpoints.getProfileData, { headers });
 				return this.makeRequest<GetProfileDataResponse>(request, "getProfile");
     }
+
+	public updateProfile(options: UpdateProfileDataRequest): Promise<SuccessResponse> {
+		const headers = {
+			Authorization: this.getAuthorizationToken(),
+		};
+
+		const request = () => this.httpService.axiosRef.put(this.profileEndpoints.updateProfile, options, { headers });
+		return this.makeRequest<SuccessResponse>(request, "updateProfile");
+	}
 
     public initLink(provider: string): Promise<InitLinkResponse> {
 				const headers = { 
@@ -46,4 +56,4 @@ export class BacklogBuddyProfileApiClient extends BacklogBuddyApiClient {
 				const request = () => this.httpService.axiosRef.delete(this.profileEndpoints.unlink(provider), { headers });
 				return this.makeRequest<SuccessResponse>(request, "unlink");
     }
-	}
+}
