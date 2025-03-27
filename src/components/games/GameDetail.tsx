@@ -66,7 +66,9 @@ export function GameDetail() {
   const [notes, setNotes] = useState<GameNote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedGame, setEditedGame] = useState<Partial<GameDetailsResponse>>({});
+  const [editedGame, setEditedGame] = useState<Partial<GameDetailsResponse>>(
+    {},
+  );
   const [newNote, setNewNote] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editedNoteContent, setEditedNoteContent] = useState("");
@@ -343,37 +345,40 @@ export function GameDetail() {
                     <Timer className="h-4 w-4 text-primary" /> Time to Beat
                   </p>
                   <div className="space-y-2 text-sm">
-                    {game.time_to_beat.hastily && (
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-1">
-                          <Zap className="h-3 w-3 text-amber-500" /> Hastily
-                        </div>
-                        <span>
-                          {Math.round(game.time_to_beat.hastily)} hours
-                        </span>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1">
+                        <Zap className="h-3 w-3 text-amber-500" /> Hastily
                       </div>
-                    )}
-                    {game.time_to_beat.normally && (
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3 text-blue-500" /> Normally
-                        </div>
-                        <span>
-                          {Math.round(game.time_to_beat.normally)} hours
-                        </span>
+                      <span>
+                        {game.time_to_beat?.hastily &&
+                        game.time_to_beat.hastily > 0
+                          ? `${Math.round(game.time_to_beat.hastily)} hours`
+                          : "Unknown"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3 text-blue-500" /> Normally
                       </div>
-                    )}
-                    {game.time_to_beat.completionist && (
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-1">
-                          <CheckCircle className="h-3 w-3 text-green-500" />{" "}
-                          Completionist
-                        </div>
-                        <span>
-                          {Math.round(game.time_to_beat.completionist)} hours
-                        </span>
+                      <span>
+                        {game.time_to_beat?.normally &&
+                        game.time_to_beat.normally > 0
+                          ? `${Math.round(game.time_to_beat.normally)} hours`
+                          : "Unknown"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3 text-green-500" />{" "}
+                        Completionist
                       </div>
-                    )}
+                      <span>
+                        {game.time_to_beat?.completionist &&
+                        game.time_to_beat.completionist > 0
+                          ? `${Math.round(game.time_to_beat.completionist)} hours`
+                          : "Unknown"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
