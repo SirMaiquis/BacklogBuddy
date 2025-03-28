@@ -40,7 +40,7 @@ interface GamingAccount {
 }
 
 export default function Settings() {
-  const { user, updateUserProfile } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 

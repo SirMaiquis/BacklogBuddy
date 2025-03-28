@@ -26,6 +26,7 @@ export function GameTabs() {
   const loadGames = async () => {
     setIsLoading(true);
     try {
+      console.log("Loading games from GameTabs.tsx");
       const data = await backlogBuddyGamesApiClient.getGames();
       setGames(data);
     } catch (error) {

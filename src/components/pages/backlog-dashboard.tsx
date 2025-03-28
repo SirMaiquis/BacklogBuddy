@@ -5,29 +5,12 @@ import { Header } from "@/components/layout/Header";
 import { WelcomeMessage } from "@/components/dashboard/WelcomeMessage";
 import { useAuth } from "@/App";
 import { Game } from "@/types/game";
-import { fetchGames } from "@/lib/api";
 
 export default function BacklogDashboard() {
   const { user } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(true);
-
-  useEffect(() => {
-    const loadGames = async () => {
-      setIsLoading(true);
-      try {
-        const data = await fetchGames();
-        setGames(data);
-      } catch (error) {
-        console.error("Failed to load games:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadGames();
-  }, []);
 
   if (!user) return null;
 

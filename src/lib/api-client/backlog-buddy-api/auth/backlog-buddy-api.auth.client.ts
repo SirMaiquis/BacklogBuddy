@@ -61,10 +61,11 @@ export class BacklogBuddyAuthApiClient extends BacklogBuddyApiClient {
 	async refreshSession(): Promise<SignInResponse> {
 		const endpoint = this.authEndpoints.refreshSession;
 		const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const refreshToken = user.refresh_token;
+		console.log("user", user);
 		const headers = {
-			RefreshToken: refreshToken,
+			refresh_token: user.refresh_token,
 		};
+		console.log("headers", headers);
 
 		const request = () => this.httpService.axiosRef.post(endpoint, null, { headers });	
 

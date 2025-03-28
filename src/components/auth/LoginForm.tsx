@@ -41,6 +41,7 @@ export default function LoginForm() {
       const userData = {
         ...response.user,
         access_token: response.session.access_token,
+        refresh_token: response.session.refresh_token,
       };
       localStorage.setItem("user", JSON.stringify(userData));
       window.location.href = "/dashboard";

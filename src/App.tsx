@@ -33,6 +33,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 const backlogBuddyAuthApiClient = new BacklogBuddyAuthApiClient();
+const refreshTokenExpirationTime = import.meta.env.VITE_REFRESH_TOKEN_EXPIRATION_TIME;
 
 function useAuth() {
   return useContext(AuthContext);
@@ -41,7 +42,6 @@ function useAuth() {
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const [lastActivity, setLastActivity] = useState(Date.now());
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -57,45 +57,33 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
-
-    const handleActivity = () => {
-      const now = Date.now();
-      if (now - lastActivity >= 10 * 60 * 1000) {
-        backlogBuddyAuthApiClient
-          .refreshSession()
-          .then((response) => {
-            if (response?.session) {
-              const userData = {
-                ...response.user,
-                access_token: response.session.access_token,
-                refresh_token: response.session.refresh_token,
-              };
-              localStorage.setItem("user", JSON.stringify(userData));
-              setUser(userData);
-            }
-          })
-          .catch((error) => {
-            console.error("Session refresh error:", error);
-            if (error.message?.includes("401")) {
-              localStorage.removeItem("user");
-              setUser(null);
-            }
-          });
+    const runPeriodicTask = async () => {
+      console.log("🔁 Running periodic task every 30 minutes");
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const refreshResponse = await backlogBuddyAuthApiClient.refreshSession();
+          if (refreshResponse?.session) {
+            const userData = {
+              ...refreshResponse.user,
+              access_token: refreshResponse.session.access_token,
+              refresh_token: refreshResponse.session.refresh_token,
+            };
+            localStorage.setItem("user", JSON.stringify(userData));
+            setUser(userData);
+          }
+        } catch (error) {
+          console.error("Failed to parse user from localStorage", error);
+          localStorage.removeItem("user");
+        }
       }
-      setLastActivity(now);
+      setLoading(false);
     };
 
-    window.addEventListener("mousemove", handleActivity);
-    window.addEventListener("keydown", handleActivity);
-    window.addEventListener("click", handleActivity);
+    const interval = setInterval(runPeriodicTask, refreshTokenExpirationTime);
 
-    return () => {
-      window.removeEventListener("mousemove", handleActivity);
-      window.removeEventListener("keydown", handleActivity);
-      window.removeEventListener("click", handleActivity);
-    };
-  }, [user, lastActivity]);
+    return () => clearInterval(interval);
+  }, []);
 
   async function signOut() {
     try {
@@ -181,6 +169,7 @@ function AppRoutes() {
 }
 
 function App() {
+
   return (
     <ThemeProvider defaultTheme="dark">
       <AuthProvider>

@@ -5,6 +5,7 @@ import { GameResponse } from "./api-client/backlog-buddy-api/games/types/respons
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function fetchGames() {
+  console.log("Fetching games from api.ts");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const response = await fetch(`${API_URL}/games`, {
     headers: {
